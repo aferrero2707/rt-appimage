@@ -28,8 +28,8 @@ after_success:
   - ls -lh build/out/* # Assuming you have some files in out/ that you would like to upload
   #- wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
-  - bash  ./upload_rotate.sh "continuous" build/out/*
-  - bash  ./upload_rotate.sh "continuous" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash
+  - bash  ./upload_rotate.sh "continuous" build/out/* >& /dev/null
+  - bash  ./upload_rotate.sh "continuous" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash >& /dev/null
 
 branches:
   except:

@@ -62,10 +62,16 @@ fi
 # Source the script:
 . ./functions.sh
 
+echo "RT_BRANCH: ${RT_BRANCH}"
 # Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
 glibcVer="$(glibc_needed)"
 #ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
-ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
+if [ "x${RT_BRANCH}" = "xreleases" ]; then
+	rtver=$(cat build/appimage/AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
+	ver="${rtver}-$(date '+%Y%m%d_%H%M')"
+else
+	ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
+fi
 ARCH="x86_64"
 VERSION="${ver}"
 mkdir -p ../out/ || exit 1
