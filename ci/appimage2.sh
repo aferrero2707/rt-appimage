@@ -67,7 +67,7 @@ echo "RT_BRANCH: ${RT_BRANCH}"
 glibcVer="$(glibc_needed)"
 #ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
 if [ "x${RT_BRANCH}" = "xreleases" ]; then
-	rtver=$(cat build/appimage/AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
+	rtver=$(cat AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
 	ver="${rtver}-$(date '+%Y%m%d_%H%M')"
 else
 	ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
