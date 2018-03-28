@@ -103,6 +103,10 @@ cd /sources
 rm -f travis.cancel
 if  [ -e /tmp/commit-${RT_BRANCH}.hash ]; then
 	git rev-parse --verify HEAD > /tmp/commit-${RT_BRANCH}-new.hash
+	echo -n "Old ${RT_BRANCH} hash: "
+	cat /tmp/commit-${RT_BRANCH}.hash
+	echo -n "New ${RT_BRANCH} hash: "
+	cat /tmp/commit-${RT_BRANCH}-new.hash
 	diff /tmp/commit-${RT_BRANCH}-new.hash /tmp/commit-${RT_BRANCH}.hash
 	if [ $? -eq 0 ]; then 
 		touch travis.cancel
