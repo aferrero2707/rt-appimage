@@ -29,7 +29,7 @@ after_success:
   #- wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
   - bash  ./upload_rotate.sh "continuous" build/out/* >& /dev/null
-  - bash  ./upload_rotate.sh "continuous" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash >& /dev/null
+  - bash  ./upload_rotate.sh "continuous" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash
 
 branches:
   except:
