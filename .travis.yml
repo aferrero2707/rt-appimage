@@ -1,0 +1,34 @@
+language: generic
+os: linux
+dist: trusty
+compiler: g++
+sudo: required
+services: docker
+env: 
+  - RT_BRANCH=dev
+  - RT_BRANCH=releases
+
+before_script:
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
+  - python support/travis_blocking_stdout.py
+  - travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-trusty-gtk3
+  - git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
+  - rm -rf RawTherapee/ci
+  - cp -a ci RawTherapee
+  - cd RawTherapee
+  - sudo docker run -it -v $(pwd):/sources photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
+  - bash ci/appimage2.sh
+after_success:
+  - cd $TRAVIS_BUILD_DIR/RawTherapee
+  - pwd
+  - ls -lh
+  - ls -lh build/out/* # Assuming you have some files in out/ that you would like to upload
+  #- wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
+  - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
+  - bash  ./upload_rotate.sh "continuous" build/out/*
+
+branches:
+  except:
+    - # Do not build tags that we create when we upload to GitHub Releases
+    - /^(?i:continuous)$/
+    
