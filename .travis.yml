@@ -16,7 +16,10 @@ before_script:
   - rm -rf RawTherapee/ci
   - cp -a ci RawTherapee
   - cd RawTherapee
-  - sudo docker run -it -v $(pwd):/sources photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
+  - sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
+  - 'if [ -e travis.cancel ]; then
+        travis cancel
+    fi'
   - bash ci/appimage2.sh
 after_success:
   - cd $TRAVIS_BUILD_DIR/RawTherapee
@@ -26,6 +29,7 @@ after_success:
   #- wget -c https://github.com/probonopd/uploadtool/raw/master/upload.sh
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
   - bash  ./upload_rotate.sh "continuous" build/out/*
+  - bash  ./upload_rotate.sh "continuous" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash
 
 branches:
   except:
