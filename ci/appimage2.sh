@@ -17,7 +17,7 @@ die () {
 trap die HUP INT QUIT ABRT TERM
 
 # Enable debugging output until this is ready for merging
-set -x
+#set -x
 
 # Program name
 APP="RawTherapee"
@@ -40,6 +40,10 @@ printf '%s\n' "" "ls -lh build:"
 ls -lh build
 printf '%s\n' "" "ls -lh build/appimage:"
 ls -lh build/appimage
+
+echo "AboutThisBuild.txt:"
+cat build/appimage/AboutThisBuild.txt
+echo ""
 
 # Go into the folder created when running the Docker container:
 printf '%s\n' "" "sudo chown -R $USER build"
