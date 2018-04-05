@@ -9,13 +9,17 @@ env:
   - RT_BRANCH=releases
 
 before_script:
-  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
-  - python support/travis_blocking_stdout.py
-  - travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-trusty-gtk3
   - git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
   - rm -rf RawTherapee/ci
   - cp -a ci RawTherapee
   - cd RawTherapee
+  - bash ci/check_commit.sh ${RT_BRANCH}
+  - 'if [ -e travis.cancel ]; then
+        exit 0;
+    fi'
+  - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
+  - python support/travis_blocking_stdout.py
+  - travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-trusty-gtk3
   - sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
   - 'if [ -e travis.cancel ]; then
         exit 0;

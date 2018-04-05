@@ -92,33 +92,6 @@ strip_binaries()
 echo ""
 echo "########################################################################"
 echo ""
-echo "Checking commit hash"
-echo ""
-sudo apt-get -y update
-sudo apt-get install -y wget git || exit 1
-rm -f /tmp/commit-${RT_BRANCH}.hash
-wget https://github.com/aferrero2707/rt-appimage/releases/download/continuous/commit-${RT_BRANCH}.hash -O /tmp/commit-${RT_BRANCH}.hash
-
-cd /sources
-rm -f travis.cancel
-if  [ -e /tmp/commit-${RT_BRANCH}.hash ]; then
-	git rev-parse --verify HEAD > /tmp/commit-${RT_BRANCH}-new.hash
-	echo -n "Old ${RT_BRANCH} hash: "
-	cat /tmp/commit-${RT_BRANCH}.hash
-	echo -n "New ${RT_BRANCH} hash: "
-	cat /tmp/commit-${RT_BRANCH}-new.hash
-	diff /tmp/commit-${RT_BRANCH}-new.hash /tmp/commit-${RT_BRANCH}.hash
-	if [ $? -eq 0 ]; then 
-		touch travis.cancel
-		echo "No new commit to be processed, exiting"
-		exit 0
-	fi
-fi
-cp /tmp/commit-${RT_BRANCH}-new.hash ./commit-${RT_BRANCH}.hash
-
-echo ""
-echo "########################################################################"
-echo ""
 echo "Installing additional system packages"
 echo ""
 
