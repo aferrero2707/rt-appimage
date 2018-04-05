@@ -21,9 +21,6 @@ before_script:
   - python support/travis_blocking_stdout.py
   - travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-trusty-gtk3
   - sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
-  - 'if [ -e travis.cancel ]; then
-        exit 0;
-    fi'
   - bash ci/appimage2.sh
 after_success:
   - cd $TRAVIS_BUILD_DIR/RawTherapee
