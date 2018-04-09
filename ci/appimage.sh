@@ -187,11 +187,17 @@ echo "Building and installing RawTherapee"
 echo ""
 
 # RawTherapee build and install
+if [ x"${RT_BRANCH}" = "xreleases" ]; then
+    CACHE_SUFFIX=""
+else
+    CACHE_SUFFIX="5-${RT_BRANCH}-ai"
+fi
+echo "RT cache suffix: \"${CACHE_SUFFIX}\""
 mkdir -p /sources/build/appimage
 cd /sources/build/appimage || exit 1
 cmake \
     -DCMAKE_BUILD_TYPE="release"  \
-    -DCACHE_NAME_SUFFIX="5-dev-ai" \
+    -DCACHE_NAME_SUFFIX="${CACHE_SUFFIX}" \
     -DPROC_TARGET_NUMBER="0" \
     -DBUILD_BUNDLE="OFF" \
     -DCMAKE_INSTALL_PREFIX="/${PREFIX}" \
