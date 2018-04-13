@@ -10,7 +10,7 @@ echo ""
 sudo apt-get -y update
 sudo apt-get install -y wget git || exit 1
 rm -f /tmp/commit-${GIT_BRANCH}.hash
-wget https://github.com/aferrero2707/rt-appimage/releases/download/continuous/commit-${GIT_BRANCH}.hash -O /tmp/commit-${GIT_BRANCH}.hash
+wget https://github.com/Beep6581/RawTherapee/releases/download/nightly/commit-${GIT_BRANCH}.hash -O /tmp/commit-${GIT_BRANCH}.hash
 
 rm -f travis.cancel
 if  [ -e /tmp/commit-${GIT_BRANCH}.hash ]; then
