@@ -27,6 +27,8 @@ APP="RawTherapee"
 # Prefix (without the leading "/") in which RawTherapee and its dependencies are installed:
 export PREFIX="${APP}"
 
+GIT_DESCRIBE=$(git describe)
+
 #TODO This seems like it does nothing, as "arch" is not set, but does get set later to x86_64
 # Get system architecture from ???
 #export ARCH="$(arch)"
@@ -74,12 +76,16 @@ else
 fi
 ARCH="x86_64"
 VERSION="${ver}"
+VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
 mkdir -p ../out/ || exit 1
 generate_appimage || exit 1
 #generate_type2_appimage
 
 pwd
 ls ../out/*
+
+rm -f ../out/${APP}-${VERSION2}.AppImage
+mv ../out/${APP}-${VERSION}*.AppImage ../out/${APP}-${VERSION2}.AppImage
 
 # Upload the AppDir
 transfer ../out/*
