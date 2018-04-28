@@ -7,7 +7,6 @@ services: docker
 env: 
   - RT_BRANCH=dev
   - RT_BRANCH=newlocallab
-  - RT_BRANCH=new-shadows-highlights
   - RT_BRANCH=releases
 
 before_script:
