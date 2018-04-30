@@ -395,6 +395,8 @@ echo ""
 # It will be used if they are newer than those of the host
 # system in which the AppImage will be executed
 mkdir -p usr/optional/fontconfig
+echo "ls /${PREFIX}/lib:"
+ls /${PREFIX}/lib
 cp -a "/${PREFIX}/lib/libfontconfig*" usr/optional/fontconfig || exit 1
 
 
