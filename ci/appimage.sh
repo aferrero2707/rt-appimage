@@ -253,8 +253,8 @@ echo ""
 
 # Manually copy librsvg, because it is not picked automatically by copy_deps
 mkdir -p ./usr/lib
-echo "cp -L /$PREFIX/lib/librsvg-2.so* ./usr/lib"
-cp -L /$PREFIX/lib/librsvg-2.so* ./usr/lib
+echo "cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib"
+cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib
 echo "ls ./usr/lib:"
 ls ./usr/lib
 
@@ -394,6 +394,19 @@ echo ""
 # Delete dangerous libraries; see
 # https://github.com/probonopd/AppImages/blob/master/excludelist
 delete_blacklisted_custom
+
+
+echo ""
+echo "########################################################################"
+echo ""
+echo "Copy libfontconfig into the AppImage"
+echo ""
+
+# Copy libfontconfig into the AppImage
+# It will be used if they are newer than those of the host
+# system in which the AppImage will be executed
+mkdir -p usr/optional/fontconfig
+cp -a "/${PREFIX}/lib/libfontconfig*" usr/optional/fontconfig || exit 1
 
 
 echo ""
