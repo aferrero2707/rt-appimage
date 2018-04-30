@@ -82,7 +82,7 @@ libasound.so.2
 # Workaround for:
 # On Ubuntu, get (inkscape:25621): GdkPixbuf-WARNING **: Error loading XPM image loader: Image type 'xpm' is not supported
 
-#libfontconfig.so.1
+libfontconfig.so.1
 #libfreetype.so.6
 # Workaround for:
 # Incompatible syntax with newer fonts.conf files on host system

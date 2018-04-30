@@ -16,7 +16,7 @@ export GDK_PIXBUF_MODULE_FILE="${HERE}/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.
 #if [[ -e /etc/fonts/fonts.conf ]]; then
 #  export FONTCONFIG_PATH=/etc/fonts
 #fi
-export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
+#export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
 
 # libstdc++ version detection
 stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
