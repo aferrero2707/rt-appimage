@@ -252,7 +252,11 @@ echo "Copy dependencies"
 echo ""
 
 # Manually copy librsvg, because it is not picked automatically by copy_deps
+mkdir -p ./usr/lib
+echo "cp -L /$PREFIX/lib/librsvg-2.so* ./usr/lib"
 cp -L /$PREFIX/lib/librsvg-2.so* ./usr/lib
+echo "ls ./usr/lib:"
+ls ./usr/lib
 
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
