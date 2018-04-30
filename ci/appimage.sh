@@ -388,6 +388,17 @@ rm -rf usr/include usr/libexec usr/_jhbuild usr/share/doc
 echo ""
 echo "########################################################################"
 echo ""
+echo "Delete blacklisted libraries"
+echo ""
+
+# Delete dangerous libraries; see
+# https://github.com/probonopd/AppImages/blob/master/excludelist
+delete_blacklisted_custom
+
+
+echo ""
+echo "########################################################################"
+echo ""
 echo "Copy libfontconfig into the AppImage"
 echo ""
 
@@ -395,20 +406,9 @@ echo ""
 # It will be used if they are newer than those of the host
 # system in which the AppImage will be executed
 mkdir -p usr/optional/fontconfig
-echo "ls /${PREFIX}/lib:"
-ls /${PREFIX}/lib
-cp -a "/${PREFIX}/lib/libfontconfig*" usr/optional/fontconfig || exit 1
-
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Delete blacklisted libraries"
-echo ""
-
-# Delete dangerous libraries; see
-# https://github.com/probonopd/AppImages/blob/master/excludelist
-delete_blacklisted_custom
+#echo "ls /${PREFIX}/lib:"
+#ls /${PREFIX}/lib
+cp -a "/${PREFIX}/lib/libfontconfig"* usr/optional/fontconfig || exit 1
 
 
 echo ""
