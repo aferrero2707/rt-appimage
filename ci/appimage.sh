@@ -501,7 +501,7 @@ echo ""
 # The fonts configuration should not be patched, copy back original one
 if [[ -e /$PREFIX/share/locale ]]; then
     mkdir -p usr/share/locale
-    cp "/$PREFIX/share/locale/"* usr/share/locale || exit 1
+    cp -a "/$PREFIX/share/locale/"* usr/share/locale || exit 1
 fi
 
 
