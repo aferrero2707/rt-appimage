@@ -46,6 +46,10 @@ libdrm.so.2
 # libGL error: failed to load driver: swrast
 # Unrecognized OpenGL version
 
+libgbm.so.1
+# Workaround for:
+# symbol lookup error: /usr/lib/libEGL.so.1: undefined symbol: gbm_bo_create_with_modifiers
+
 libxcb.so.1
 # Workaround for:
 # Fedora 23
