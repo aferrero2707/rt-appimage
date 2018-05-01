@@ -37,31 +37,32 @@ fi
 # fonconfig version detection
 fclib="$(ldconfig -p | grep 'libfontconfig' | grep '(libc6,x86-64)'| awk 'NR==1{print $NF}')"
 if [ -n "$fclib" ]; then
-	fclib=$(readlink -f "$fclib")
-	fcv=$(basename "$fclib" | tail -c +18)
+        fclib=$(readlink -f "$fclib")
+        fcv=$(basename "$fclib" | tail -c +18)
 fi
-fclib2="$(ls $HERE/lib/libfontconfig.so.*.*.* | head -n 1)"
+fclib2="$(ls $HERE/optional/fontconfig/libfontconfig.so.*.*.* | head -n 1)"
 if [ -n "$fclib2" ]; then
-	fclib2=$(readlink -f "$fclib2")
-	fcv2=$(basename "$fclib2" | tail -c +18)
+        fclib2=$(readlink -f "$fclib2")
+        fcv2=$(basename "$fclib2" | tail -c +18)
 fi
 echo "fcv: \"$fcv\"  fcv2: \"$fcv2\""
-if [ -z "$fclib" ]; then
-   echo "Using bundled fontconfig library"
+if [ x"$fclib" = "x" ]; then
+   echo "Ssystem fontconfig missing, using bundled fontconfig library"
    export LD_LIBRARY_PATH="${HERE}/optional/fontconfig:${LD_LIBRARY_PATH}"
+   export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
 fi
 if [ x"$fclib" != "x" -a x"$fclib2" != "x" ]; then
-   echo "Using bundled fontconfig library"
-   export LD_LIBRARY_PATH="${HERE}/optional/fontconfig:${LD_LIBRARY_PATH}"
-fi
-fcvnewest=$(echo "$fcv1 $fcv2" | tr " " "\n" | sort -V | tail -n 1)
+   echo "echo \"$fcv $fcv2\" | tr \" \" \"\n\" | sort -V | tail -n 1"
+   fcvnewest=$(echo "$fcv $fcv2" | tr " " "\n" | sort -V | tail -n 1)
 
-echo "Newest fontconfig library version: \"$fcvnewest\""
-if [[ x"$fcvnewest" = x"$fcv1" ]]; then
-   echo "Using system fontconfig library"
-else
-   echo "Using bundled fontconfig library"
-   export LD_LIBRARY_PATH="${HERE}/optional/fontconfig:${LD_LIBRARY_PATH}"
+   echo "Newest fontconfig library version: \"$fcvnewest\""
+   if [[ x"$fcvnewest" = x"$fcv" ]]; then
+      echo "Using system fontconfig library"
+   else
+      echo "Using bundled fontconfig library"
+      export LD_LIBRARY_PATH="${HERE}/optional/fontconfig:${LD_LIBRARY_PATH}"
+      export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
+   fi
 fi
 
 ldd "./bin/rawtherapee"
