@@ -458,8 +458,8 @@ cp "/${PREFIX}/share/applications/rawtherapee.desktop" "usr/share/applications" 
 
 # Copy hicolor icon theme
 mkdir -p usr/share/icons
-echo "cp -r \"/${PREFIX}/share/icons/hicolor\" \"usr/share/icons\""
-cp -r "/${PREFIX}/share/icons/hicolor" "usr/share/icons" || exit 1
+echo "cp -r \"/${PREFIX}/share/icons/\"* \"usr/share/icons\""
+cp -r "/${PREFIX}/share/icons/"* "usr/share/icons" || exit 1
 echo ""
 
 
