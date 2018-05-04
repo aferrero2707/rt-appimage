@@ -548,8 +548,9 @@ strip_binaries
 cd "$APPIMAGEBASE"
 rm -f "${APP}.tgz"
 tar czf "${APP}.tgz" "${APP}.AppDir"
+ls -lh "${APP}.tgz"
 transfer "${APP}.tgz"
-
+printf '%s\n' "" "The .tgz has been uploaded to the URL above." ""
 # AppDir complete
 # Packaging it as an AppImage cannot be done within a Docker container
 exit 0
