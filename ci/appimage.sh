@@ -545,6 +545,11 @@ echo ""
 # Strip binaries.
 strip_binaries
 
+cd "$APPIMAGEBASE"
+rm -f "${APP}.tgz"
+tar czf "${APP}.tgz" "${APP}.AppDir"
+transfer "${APP}.tgz"
+
 # AppDir complete
 # Packaging it as an AppImage cannot be done within a Docker container
 exit 0
