@@ -525,8 +525,12 @@ echo ""
 # Update the Lensfun database and put the newest version into the bundle
 "/$PREFIX/bin/lensfun-update-data"
 mkdir -p usr/share/lensfun/version_1
-cp -a /var/lib/lensfun-updates/version_1/* usr/share/lensfun/version_1 || exit 1
-printf '%s\n' "" "==================" "Contents of updated lensfun database:"
+if [ -e /var/lib/lensfun-updates/version_1 ]; then
+	cp -a /var/lib/lensfun-updates/version_1/* usr/share/lensfun/version_1
+else
+	cp -a "/$PREFIX/share/lensfun/version_1/"* usr/share/lensfun/version_1
+fi
+printf '%s\n' "" "==================" "Contents of lensfun database:"
 ls usr/share/lensfun/version_1
 echo ""
 
