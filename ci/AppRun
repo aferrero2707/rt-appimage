@@ -67,3 +67,4 @@ fi
 
 ldd "./bin/rawtherapee"
 "./bin/rawtherapee.wrapper" "$@"
+#valgrind --tool=callgrind --instr-atstart=no "./bin/rawtherapee" "$@"

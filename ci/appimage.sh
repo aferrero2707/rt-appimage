@@ -145,7 +145,8 @@ rm -f get-pip.py
 wget https://bootstrap.pypa.io/get-pip.py
 python get-pip.py
 pip install six || exit 1
-pip3 install six || exit 1
+python3 get-pip.py
+pip install six || exit 1
 
 # Libcanberra build and install
 rm -rf libcanberra*
