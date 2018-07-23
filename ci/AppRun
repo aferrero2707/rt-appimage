@@ -18,6 +18,24 @@ export GDK_PIXBUF_MODULE_FILE="${HERE}/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.
 #fi
 #export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
 
+
+# libc version detection
+stdlibc="$(ldconfig -p | grep 'libc.so.6 (libc6,x86-64'| awk 'NR==1{print $NF}')"
+echo "System libc library: \"$stdlibc\""
+stdlibcver1=$(readelf -s "$stdlibc" | cut -d "@" -f 3 | grep '^GLIBC_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
+echo "System libc library version: \"$stdlibcver1\""
+stdlibcver2=$(readelf -s "$HERE/optional/libc/libc.so.6" | cut -d "@" -f 3 | grep '^GLIBC_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
+echo "Bundled libc library version: \"$stdlibcver2\""
+stdlibcnewest=$(echo "$stdlibcver1 $stdlibcver2" | tr " " "\n" | sort -V | tail -n 1)
+echo "Newest libc library version: \"$stdlibcnewest\""
+if [[ x"$stdlibcnewest" = x"$stdlibcver1" ]]; then
+   echo "Using system libc library"
+else
+   echo "Using bundled libc library"
+   export LD_LIBRARY_PATH="${HERE}/optional/libc:${LD_LIBRARY_PATH}"
+fi
+
+
 # libstdc++ version detection
 stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
 echo "System stdc++ library: \"$stdcxxlib\""

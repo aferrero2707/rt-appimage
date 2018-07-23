@@ -415,12 +415,23 @@ cp -a "/${PREFIX}/lib/libfontconfig"* usr/optional/fontconfig || exit 1
 echo ""
 echo "########################################################################"
 echo ""
-echo "Copy libstdc++.so.6 and libgomp.so.1 into the AppImage"
+echo "Copy libc.so.6, libstdc++.so.6 and libgomp.so.1 into the AppImage"
 echo ""
 
-# Copy libstdc++.so.6 and libgomp.so.1 into the AppImage
+# Copy libc.so.6, libstdc++.so.6 and libgomp.so.1 into the AppImage
 # They will be used if they are newer than those of the host
 # system in which the AppImage will be executed
+
+stdlibc="$(ldconfig -p | grep 'libc.so.6 (libc6,x86-64'| awk 'NR==1{print $NF}')"
+echo "stdlibc: $stdlibc"
+if [[ x"$stdlibc" != "x" ]]; then
+    mkdir -p usr/optional/libc
+    cp -L "$stdlibc" usr/optional/libc || exit 1
+fi
+echo "ls -l usr/optional/libc"
+ls -l usr/optional/libc
+read dummy
+
 stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
 echo "stdcxxlib: $stdcxxlib"
 if [[ x"$stdcxxlib" != "x" ]]; then

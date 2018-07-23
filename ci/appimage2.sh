@@ -88,6 +88,6 @@ rm -f ../out/${APP}-${VERSION2}.AppImage
 mv ../out/${APP}-${VERSION}*.AppImage ../out/${APP}-${VERSION2}.AppImage
 
 # Upload the AppDir
-#transfer ../out/*
+transfer ../out/${APP}-${VERSION2}.AppImage
 
-#printf '%s\n' "" "The AppImage has been uploaded to the URL above." ""
+printf '%s\n' "" "The AppImage has been uploaded to the URL above." ""
