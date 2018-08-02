@@ -270,14 +270,23 @@ rm -rf ./lib/x86_64-linux-gnu
 cp -L ./lib/*.* ./usr/lib
 rm -rf ./lib
 
+cp -L ./lib64/*.* ./usr/lib
+rm -rf ./lib64
+
 cp -L ./usr/lib/x86_64-linux-gnu/*.* ./usr/lib
 rm -rf ./usr/lib/x86_64-linux-gnu
+
+cp -L ./usr/lib64/*.* ./usr/lib
+rm -rf ./usr/lib64
 
 cp -L "./$PREFIX/lib/x86_64-linux-gnu/"*.* ./usr/lib
 rm -rf "./$PREFIX/lib/x86_64-linux-gnu"
 
 cp -L "./$PREFIX/lib/"*.* ./usr/lib
 rm -rf "./$PREFIX/lib"
+
+cp -L "./$PREFIX/lib64/"*.* ./usr/lib
+rm -rf "./$PREFIX/lib64"
 
 
 echo ""
