@@ -103,7 +103,7 @@ yum install -y wget curl git || exit 1
 # Set environment variables to allow finding the dependencies that are
 # compiled from sources
 export PATH="/${PREFIX}/bin:/work/inst/bin:${PATH}"
-export LD_LIBRARY_PATH="/${PREFIX}/lib:/work/inst/lib:${LD_LIBRARY_PATH}"
+export LD_LIBRARY_PATH="/${PREFIX}/lib:/${PREFIX}/lib64:/work/inst/lib:/work/inst/lib64:${LD_LIBRARY_PATH}"
 export PKG_CONFIG_PATH="/${PREFIX}/lib/pkgconfig://${PREFIX}/lib64/pkgconfig:/work/inst/lib/pkgconfig:${PKG_CONFIG_PATH}"
 
 locale-gen en_US.UTF-8
