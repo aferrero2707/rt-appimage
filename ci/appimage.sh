@@ -430,7 +430,6 @@ if [[ x"$stdlibc" != "x" ]]; then
 fi
 echo "ls -l usr/optional/libc"
 ls -l usr/optional/libc
-read dummy
 
 stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
 echo "stdcxxlib: $stdcxxlib"
