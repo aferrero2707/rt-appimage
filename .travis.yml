@@ -6,9 +6,9 @@ sudo: required
 services: docker
 env: 
   - RT_BRANCH=dev
-  - RT_BRANCH=newlocallab
-  - RT_BRANCH=waveletnew
-  - RT_BRANCH=releases
+  #- RT_BRANCH=newlocallab
+  #- RT_BRANCH=waveletnew
+  #- RT_BRANCH=releases
 
 before_script:
   - git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
@@ -22,7 +22,8 @@ before_script:
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
   - travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-trusty-gtk3
-  - sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
+  #- sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
+  - sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-centos6-gtk3 bash /sources/ci/appimage-centos6.sh
   - bash ci/appimage2.sh
 after_success:
   - cd $TRAVIS_BUILD_DIR/RawTherapee
