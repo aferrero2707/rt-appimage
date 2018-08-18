@@ -310,13 +310,14 @@ echo "Compile Glib schemas"
 echo ""
 
 # Compile Glib schemas
+glib_prefix="$(pkg-config --variable=prefix glib-2.0)"
 (mkdir -p usr/share/glib-2.0/schemas/ && \
-cp -a /$PREFIX/share/glib-2.0/schemas/* usr/share/glib-2.0/schemas && \
+cp -a ${glib_prefix}/share/glib-2.0/schemas/* usr/share/glib-2.0/schemas && \
 cd usr/share/glib-2.0/schemas/ && \
 glib-compile-schemas .) || exit 1
 
 # Copy gconv
-cp -a /usr/lib/x86_64-linux-gnu/gconv usr/lib
+cp -a /usr/lib64/gconv usr/lib
 
 
 echo ""
@@ -433,7 +434,8 @@ echo ""
 mkdir -p usr/optional/fontconfig
 #echo "ls /${PREFIX}/lib:"
 #ls /${PREFIX}/lib
-cp -a "/${PREFIX}/lib/libfontconfig"* usr/optional/fontconfig || exit 1
+fc_prefix="$(pkg-config --variable=libdir fontconfig)"
+cp -a "${fc_prefix}/libfontconfig"* usr/optional/fontconfig || exit 1
 
 
 echo ""
