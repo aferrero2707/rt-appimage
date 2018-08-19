@@ -504,6 +504,7 @@ echo ""
 # TODO Might want to "|| exit 1" these, and generate_status
 #get_apprun || exit 1
 cp -a "${AI_SCRIPTS_DIR}/AppRun" . || exit 1
+cp -a "${AI_SCRIPTS_DIR}/fixes.sh" . || exit 1
 get_desktop || exit 1
 get_icon || exit 1
 

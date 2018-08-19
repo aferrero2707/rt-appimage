@@ -1,11 +1,22 @@
 #!/usr/bin/env bash
 HERE="$(dirname "$(readlink -f "${0}")")"
 export APPDIR="$HERE"
+
+source "$APPDIR/fixes.sh"
+make_temp_libdir
+link_libraries
+echo "AILIBDIR=$AILIBDIR"
+fix_libxcb_dri3
+fix_stdlibcxx
+fix_fontconfig
+#exit
+
 cd "$HERE"
 cd usr
 HERE="$(pwd)"
+
 export PATH="${PATH}:/sbin:/usr/sbin"
-export LD_LIBRARY_PATH="$HERE/lib:/usr/lib:$LD_LIBRARY_PATH"
+export LD_LIBRARY_PATH="$AILIBDIR:/usr/lib:$LD_LIBRARY_PATH"
 export XDG_DATA_DIRS="${HERE}/share/:${HERE}/share/mime/:${XDG_DATA_DIRS}"
 export GTK_PATH="${HERE}/lib/gtk-2.0:${GTK_PATH}"
 export PANGO_LIBDIR="${HERE}/lib"
@@ -19,70 +30,8 @@ export GDK_PIXBUF_MODULE_FILE="${HERE}/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.
 #export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
 
 
-# libc version detection
-stdlibc="$(ldconfig -p | grep 'libc.so.6 (libc6,x86-64'| awk 'NR==1{print $NF}')"
-echo "System libc library: \"$stdlibc\""
-stdlibcver1=$(readelf -s "$stdlibc" | cut -d "@" -f 3 | grep '^GLIBC_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
-echo "System libc library version: \"$stdlibcver1\""
-stdlibcver2=$(readelf -s "$HERE/optional/libc/libc.so.6" | cut -d "@" -f 3 | grep '^GLIBC_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
-echo "Bundled libc library version: \"$stdlibcver2\""
-stdlibcnewest=$(echo "$stdlibcver1 $stdlibcver2" | tr " " "\n" | sort -V | tail -n 1)
-echo "Newest libc library version: \"$stdlibcnewest\""
-if [[ x"$stdlibcnewest" = x"$stdlibcver1" ]]; then
-   echo "Using system libc library"
-else
-   echo "Using bundled libc library"
-   export LD_LIBRARY_PATH="${HERE}/optional/libc:${LD_LIBRARY_PATH}"
-fi
-
-
-# libstdc++ version detection
-stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
-echo "System stdc++ library: \"$stdcxxlib\""
-stdcxxver1=$(strings "$stdcxxlib" | grep '^GLIBCXX_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
-echo "System stdc++ library version: \"$stdcxxver1\""
-stdcxxver2=$(strings "$HERE/optional/libstdc++/libstdc++.so.6" | grep '^GLIBCXX_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
-echo "Bundled stdc++ library version: \"$stdcxxver2\""
-stdcxxnewest=$(echo "$stdcxxver1 $stdcxxver2" | tr " " "\n" | sort -V | tail -n 1)
-echo "Newest stdc++ library version: \"$stdcxxnewest\""
-if [[ x"$stdcxxnewest" = x"$stdcxxver1" ]]; then
-   echo "Using system stdc++ library"
-else
-   echo "Using bundled stdc++ library"
-   export LD_LIBRARY_PATH="${HERE}/optional/libstdc++:${LD_LIBRARY_PATH}"
-fi
-
-# fonconfig version detection
-fclib="$(ldconfig -p | grep 'libfontconfig' | grep '(libc6,x86-64)'| awk 'NR==1{print $NF}')"
-if [ -n "$fclib" ]; then
-        fclib=$(readlink -f "$fclib")
-        fcv=$(basename "$fclib" | tail -c +18)
-fi
-fclib2="$(ls $HERE/optional/fontconfig/libfontconfig.so.*.*.* | head -n 1)"
-if [ -n "$fclib2" ]; then
-        fclib2=$(readlink -f "$fclib2")
-        fcv2=$(basename "$fclib2" | tail -c +18)
-fi
-echo "fcv: \"$fcv\"  fcv2: \"$fcv2\""
-if [ x"$fclib" = "x" ]; then
-   echo "Ssystem fontconfig missing, using bundled fontconfig library"
-   export LD_LIBRARY_PATH="${HERE}/optional/fontconfig:${LD_LIBRARY_PATH}"
-   export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
-fi
-if [ x"$fclib" != "x" -a x"$fclib2" != "x" ]; then
-   echo "echo \"$fcv $fcv2\" | tr \" \" \"\n\" | sort -V | tail -n 1"
-   fcvnewest=$(echo "$fcv $fcv2" | tr " " "\n" | sort -V | tail -n 1)
-
-   echo "Newest fontconfig library version: \"$fcvnewest\""
-   if [[ x"$fcvnewest" = x"$fcv" ]]; then
-      echo "Using system fontconfig library"
-   else
-      echo "Using bundled fontconfig library"
-      export LD_LIBRARY_PATH="${HERE}/optional/fontconfig:${LD_LIBRARY_PATH}"
-      export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
-   fi
-fi
-
 ldd "./bin/rawtherapee"
 "./bin/rawtherapee.wrapper" "$@"
 #valgrind --tool=callgrind --instr-atstart=no "./bin/rawtherapee" "$@"
+
+rm -rf "$AILIBDIR"
