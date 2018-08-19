@@ -25,12 +25,12 @@ before_script:
   #- sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-trusty-gtk3 bash /sources/ci/appimage.sh
   - travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-centos7-gtk3
   - sudo docker run -it -v $(pwd):/sources -e "RT_BRANCH=${RT_BRANCH}" photoflow/docker-centos7-gtk3 bash /sources/ci/appimage-centos7.sh
-  - bash ci/appimage2.sh
+  #- bash ci/appimage2.sh
 after_success:
   - cd $TRAVIS_BUILD_DIR/RawTherapee
   - pwd
   - ls -lh
-  - ls -lh build/out/* # Assuming you have some files in out/ that you would like to upload
+  #- ls -lh build/out/* # Assuming you have some files in out/ that you would like to upload
   #- wget -c https://github.com/aferrero2707/uploadtool/raw/master/remove.sh
   #- TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee-${RT_BRANCH}-" ".AppImage"
   #- wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh

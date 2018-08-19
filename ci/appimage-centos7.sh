@@ -202,6 +202,10 @@ echo ""
 echo "Building and installing RawTherapee"
 echo ""
 
+cd /sources
+export GIT_DESCRIBE=$(git describe)
+
+
 # RawTherapee build and install
 if [ x"${RT_BRANCH}" = "xreleases" ]; then
     CACHE_SUFFIX=""
@@ -209,8 +213,8 @@ else
     CACHE_SUFFIX="5-${RT_BRANCH}-ai"
 fi
 echo "RT cache suffix: \"${CACHE_SUFFIX}\""
-mkdir -p /sources/build/appimage
-cd /sources/build/appimage || exit 1
+mkdir -p /work/build/rt
+cd /work/build/rt || exit 1
 cmake \
     -DCMAKE_BUILD_TYPE="release"  \
     -DCACHE_NAME_SUFFIX="${CACHE_SUFFIX}" \
@@ -582,6 +586,55 @@ tar czf "${APP}.tgz" "${APP}.AppDir"
 ls -lh "${APP}.tgz"
 transfer "${APP}.tgz"
 printf '%s\n' "" "The .tgz has been uploaded to the URL above." ""
-# AppDir complete
-# Packaging it as an AppImage cannot be done within a Docker container
-exit 0
+
+
+
+
+echo "RT_BRANCH: ${RT_BRANCH}"
+# Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
+glibcVer="$(glibc_needed)"
+#ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
+if [ "x${RT_BRANCH}" = "xreleases" ]; then
+	rtver=$(cat AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
+	ver="${rtver}-$(date '+%Y%m%d_%H%M')"
+else
+	ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
+fi
+ARCH="x86_64"
+VERSION="${ver}"
+VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
+
+yum install -y bsdtar || exit 1
+wd="$(pwd)"
+mkdir -p ../out/
+ARCH="x86_64"
+#generate_appimage
+# Download AppImageAssistant
+URL="https://github.com/AppImage/AppImageKit/releases/download/6/AppImageAssistant_6-x86_64.AppImage"
+rm -f AppImageAssistant
+wget -c "$URL" -O AppImageAssistant
+chmod a+x ./AppImageAssistant
+(rm -rf /tmp/squashfs-root && mkdir /tmp/squashfs-root && cd /tmp/squashfs-root && bsdtar xfp $wd/AppImageAssistant) || exit 1
+#./AppImageAssistant --appimage-extract
+mkdir -p ../out || true
+GLIBC_NEEDED=$(glibc_needed)
+AI_OUT="../out/${APP}-${VERSION}.glibc${GLIBC_NEEDED}-${ARCH}.AppImage"
+rm "${AI_OUT}" 2>/dev/null || true
+/tmp/squashfs-root/AppRun ./$APP.AppDir/ "${AI_OUT}"
+ 
+ls ../out/*
+
+rm -f ../out/${APP}-${VERSION2}.AppImage
+mv "${AI_OUT}" ../out/${APP}-${VERSION2}.AppImage
+
+
+########################################################################
+# Upload the AppDir
+########################################################################
+
+pwd
+ls ../out/*
+transfer ../out/*
+echo ""
+echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
+cp ../out/${APP}-${VERSION2}.AppImage /sources

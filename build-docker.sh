@@ -1,8 +1,10 @@
 #! /bin/bash
 
 export RT_BRANCH=dev
-rm -rf RawTherapee
-git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
+#rm -rf RawTherapee
+if [ ! -e RawTherapee ]; then
+	git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
+fi
 rm -rf RawTherapee/ci
 cp -a ci RawTherapee
 cd RawTherapee
