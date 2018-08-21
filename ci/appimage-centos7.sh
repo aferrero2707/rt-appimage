@@ -638,4 +638,5 @@ ls ../out/*
 transfer ../out/*
 echo ""
 echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
-cp ../out/${APP}-${VERSION2}.AppImage /sources
+mkdir -p /sources/out
+cp ../out/${APP}-${VERSION2}.AppImage /sources/out
