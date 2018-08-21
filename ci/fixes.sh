@@ -13,8 +13,8 @@ fix_libxcb_dri3() {
 	libxcbdri3="$(ldconfig -p | grep 'libxcb-dri3.so.0 (libc6,x86-64'| awk 'NR==1{print $NF}')"
 	temp="$(strings $libxcbdri3 | grep xcb_dri3_get_supported_modifiers)"
 	if [ -n "$temp" ]; then
-		echo "deleting $APPDIR/usr/lib/libxcb-dri3.so*"
-		rm -f "$APPDIR/usr/lib"/libxcb-dri3.so*
+		echo "deleting $AILIBDIR/libxcb-dri3.so*"
+		rm -f "$AILIBDIR"/libxcb-dri3.so*
 	fi
 }
 
