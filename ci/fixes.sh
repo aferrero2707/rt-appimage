@@ -10,7 +10,7 @@ link_libraries() {
 
 
 fix_libxcb_dri3() {
-	libxcbdri3="$(ldconfig -p | grep 'libxcb-dri3.so.0 (libc6,x86-64'| awk 'NR==1{print $NF}')"
+	libxcbdri3="$(/sbin/ldconfig -p | grep 'libxcb-dri3.so.0 (libc6,x86-64'| awk 'NR==1{print $NF}')"
 	temp="$(strings $libxcbdri3 | grep xcb_dri3_get_supported_modifiers)"
 	if [ -n "$temp" ]; then
 		echo "deleting $AILIBDIR/libxcb-dri3.so*"
@@ -21,7 +21,7 @@ fix_libxcb_dri3() {
 
 fix_stdlibcxx() {
 # libstdc++ version detection
-stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
+stdcxxlib="$(/sbin/ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
 echo "System stdc++ library: \"$stdcxxlib\""
 stdcxxver1=$(strings "$stdcxxlib" | grep '^GLIBCXX_[0-9].[0-9]*' | cut -d"_" -f 2 | sort -V | tail -n 1)
 echo "System stdc++ library version: \"$stdcxxver1\""
@@ -40,7 +40,7 @@ echo "Newest stdc++ library version: \"$stdcxxnewest\""
 
 fix_fontconfig() {
 # fonconfig version detection
-fclib="$(ldconfig -p | grep 'libfontconfig' | grep '(libc6,x86-64)'| awk 'NR==1{print $NF}')"
+fclib="$(/sbin/ldconfig -p | grep 'libfontconfig' | grep '(libc6,x86-64)'| awk 'NR==1{print $NF}')"
 if [ -n "$fclib" ]; then
         fclib=$(readlink -f "$fclib")
         fcv=$(basename "$fclib" | tail -c +18)
