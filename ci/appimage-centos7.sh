@@ -253,7 +253,8 @@ echo "Creating and cleaning AppImage folder"
 # Create a folder in the shared area where the AppImage structure will be copied
 mkdir -p /work/appimage
 cd /work/appimage || exit 1
-cp "${AI_SCRIPTS_DIR}"/excludelist . || exit 1
+#cp "${AI_SCRIPTS_DIR}"/excludelist . || exit 1
+wget -q https://raw.githubusercontent.com/aferrero2707/appimage-helper-scripts/master/excludelist -O ./excludelist
 export APPIMAGEBASE="$(pwd)"
 
 # Remove old AppDir structure (if existing)
