@@ -2,7 +2,7 @@
 HERE="$(dirname "$(readlink -f "${0}")")"
 export APPDIR="$HERE"
 
-source "$APPDIR/fixes.sh"
+source "$APPDIR/apprun-helper.sh"
 make_temp_libdir
 link_libraries
 echo "AILIBDIR=$AILIBDIR"
@@ -11,18 +11,18 @@ fix_stdlibcxx
 fix_fontconfig
 #exit
 
-cd "$HERE"
-cd usr
-HERE="$(pwd)"
+#cd "$HERE"
+#cd usr
+#HERE="$(pwd)"
 
 export PATH="${PATH}:/sbin:/usr/sbin"
 export LD_LIBRARY_PATH="$AILIBDIR:/usr/lib:$LD_LIBRARY_PATH"
-export XDG_DATA_DIRS="${HERE}/share/:${HERE}/share/mime/:${XDG_DATA_DIRS}"
-export GTK_PATH="${HERE}/lib/gtk-2.0:${GTK_PATH}"
-export PANGO_LIBDIR="${HERE}/lib"
-export GCONV_PATH="${HERE}/lib/gconv"
-export GDK_PIXBUF_MODULEDIR="${HERE}/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders"
-export GDK_PIXBUF_MODULE_FILE="${HERE}/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0/loaders.cache"
+export XDG_DATA_DIRS="${APPDIR}/usr/share/:${APPDIR}/usr/share/mime/:${XDG_DATA_DIRS}"
+export GTK_PATH="${APPDIR}/usr/lib/gtk-2.0:${GTK_PATH}"
+export PANGO_LIBDIR="${APPDIR}/usr/lib"
+export GCONV_PATH="${APPDIR}/usr/lib/gconv"
+export GDK_PIXBUF_MODULEDIR="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders"
+export GDK_PIXBUF_MODULE_FILE="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders.cache"
 
 #if [[ -e /etc/fonts/fonts.conf ]]; then
 #  export FONTCONFIG_PATH=/etc/fonts
@@ -30,8 +30,13 @@ export GDK_PIXBUF_MODULE_FILE="${HERE}/lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.
 #export FONTCONFIG_PATH="$HERE/etc/fonts/fonts.conf"
 
 
-ldd "./bin/rawtherapee"
-"./bin/rawtherapee.wrapper" "$@"
+ldd "${APPDIR}/usr/bin/rawtherapee"
+if [ x"$1" = "x--cli" ]; then
+	shift
+	"${APPDIR}/usr/bin/rawtherapee-cli" "$@"
+else
+	"${APPDIR}/usr/bin/rawtherapee.wrapper" "$@"
 #valgrind --tool=callgrind --instr-atstart=no "./bin/rawtherapee" "$@"
+fi
 
 rm -rf "$AILIBDIR"

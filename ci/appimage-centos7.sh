@@ -89,17 +89,6 @@ strip_binaries()
 }
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Installing additional system packages"
-echo ""
-
-# Add some required packages
-yum install -y wget curl git lcms2-devel || exit 1
-
-(cd /work && rm -rf libiptcdata* && wget https://sourceforge.net/projects/libiptcdata/files/libiptcdata/1.0.4/libiptcdata-1.0.4.tar.gz && tar xzvf libiptcdata-1.0.4.tar.gz && cd libiptcdata-1.0.4 && ./configure --prefix=/$AIPREFIX && make -j 2 install) || exit 1
-
 # Set environment variables to allow finding the dependencies that are
 # compiled from sources
 export PATH="/${PREFIX}/bin:/work/inst/bin:${PATH}"
@@ -111,6 +100,24 @@ export LANG="en_US.UTF-8"
 export LANGUAGE="en_US:en"
 export LC_ALL="en_US.UTF-8"
 
+
+# Add some required packages
+yum install -y wget curl git lcms2-devel which || exit 1
+
+DO_BUILD=0
+if [ ! -e /work/build.done ]; then
+	DO_BUILD=1
+fi
+
+if [ x"$DO_BUILD" = "x1" ]; then
+
+echo ""
+echo "########################################################################"
+echo ""
+echo "Installing additional system packages"
+echo ""
+
+(cd /work && rm -rf libiptcdata* && wget https://sourceforge.net/projects/libiptcdata/files/libiptcdata/1.0.4/libiptcdata-1.0.4.tar.gz && tar xzvf libiptcdata-1.0.4.tar.gz && cd libiptcdata-1.0.4 && ./configure --prefix=/$AIPREFIX && make -j 2 install) || exit 1
 
 
 # Install missing six python module
@@ -215,13 +222,15 @@ fi
 echo "RT cache suffix: \"${CACHE_SUFFIX}\""
 mkdir -p /work/build/rt
 cd /work/build/rt || exit 1
+rm -f /work/build/rt/CMakeCache.txt
 cmake \
     -DCMAKE_BUILD_TYPE="release"  \
     -DCACHE_NAME_SUFFIX="${CACHE_SUFFIX}" \
     -DPROC_TARGET_NUMBER="0" \
-    -DBUILD_BUNDLE="OFF" \
-    -DCMAKE_INSTALL_PREFIX="/${PREFIX}" \
-    -DBUNDLE_BASE_INSTALL_DIR="/${PREFIX}" \
+    -DBUILD_BUNDLE="ON" \
+    -DCMAKE_INSTALL_PREFIX="/${PREFIX}/rt" \
+    -DBUNDLE_BASE_INSTALL_DIR="/${PREFIX}/rt/bin" \
+    -DDATADIR=".." \
     -DOPTION_OMP="ON" \
     -DWITH_LTO="OFF" \
     -DWITH_PROF="OFF" \
@@ -230,6 +239,11 @@ cmake \
     /sources || exit 1
 make --jobs=2 || exit 1
 make install || exit 1
+
+touch /work/build.done
+
+fi
+
 
 echo ""
 echo "########################################################################"
@@ -258,10 +272,21 @@ echo "########################################################################"
 echo ""
 echo "Copy executable"
 
+echo ""
+echo "########################################################################"
+echo ""
+echo "Copy RT folders"
+echo ""
+
+# Copy RT folders
+mkdir -p usr/share
+echo "cp -a \"/$PREFIX/rt\"/* usr"
+cp -a "/$PREFIX/rt"/* usr || exit 1
+
 # Copy main RT executable into $APPDIR/usr/bin/rawtherapee
-mkdir -p ./usr/bin
-echo "cp -a \"/${PREFIX}/bin/${LOWERAPP}\" \"./usr/bin/${LOWERAPP}\""
-cp -a "/${PREFIX}/bin/${LOWERAPP}" "./usr/bin/${LOWERAPP}" || exit 1
+#mkdir -p ./usr/bin
+#echo "cp -a \"/${PREFIX}/rt/bin/${LOWERAPP}\" \"./usr/bin/${LOWERAPP}\""
+#cp -a "/${PREFIX}/rt/bin/${LOWERAPP}" "./usr/bin/${LOWERAPP}" || exit 1
 echo ""
 
 
@@ -272,38 +297,47 @@ echo "Copy dependencies"
 echo ""
 
 # Manually copy librsvg, because it is not picked automatically by copy_deps
-mkdir -p ./usr/lib
-echo "cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib"
-cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib
-echo "ls ./usr/lib:"
-ls ./usr/lib
+#mkdir -p ./usr/lib
+#echo "cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib"
+#cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib
+#echo "ls ./usr/lib:"
+#ls ./usr/lib
+
+#echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+#ldd "./usr/bin/${LOWERAPP}"
+
 
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
 copy_deps; copy_deps; copy_deps;
 
-cp -L ./lib/x86_64-linux-gnu/*.* ./usr/lib
+#exit
+
+mkdir -p ./usr/lib
+ls -l ./usr/lib
+
+cp -a ./lib/x86_64-linux-gnu/*.so* ./usr/lib
 rm -rf ./lib/x86_64-linux-gnu
 
-cp -L ./lib/*.* ./usr/lib
+cp -a ./lib/*.so* ./usr/lib
 rm -rf ./lib
 
-cp -L ./lib64/*.* ./usr/lib
+cp -a ./lib64/*.so* ./usr/lib
 rm -rf ./lib64
 
-cp -L ./usr/lib/x86_64-linux-gnu/*.* ./usr/lib
+cp -a ./usr/lib/x86_64-linux-gnu/*.so* ./usr/lib
 rm -rf ./usr/lib/x86_64-linux-gnu
 
-cp -L ./usr/lib64/*.* ./usr/lib
+cp -a ./usr/lib64/*.so* ./usr/lib
 rm -rf ./usr/lib64
 
-cp -L "./$PREFIX/lib/x86_64-linux-gnu/"*.* ./usr/lib
+cp -a "./$PREFIX/lib/x86_64-linux-gnu/"*.so* ./usr/lib
 rm -rf "./$PREFIX/lib/x86_64-linux-gnu"
 
-cp -L "./$PREFIX/lib/"*.* ./usr/lib
+cp -a "./$PREFIX/lib/"*.so* ./usr/lib
 rm -rf "./$PREFIX/lib"
 
-cp -L "./$PREFIX/lib64/"*.* ./usr/lib
+cp -a "./$PREFIX/lib64/"*.so* ./usr/lib
 rm -rf "./$PREFIX/lib64"
 
 
@@ -334,7 +368,7 @@ echo ""
 # so that modules are picked from the AppImage bundle
 gdk_pixbuf_moduledir="$(pkg-config --variable=gdk_pixbuf_moduledir gdk-pixbuf-2.0)"
 gdk_pixbuf_cache_file="$(pkg-config --variable=gdk_pixbuf_cache_file gdk-pixbuf-2.0)"
-gdk_pixbuf_libdir_bundle="lib/x86_64-linux-gnu/gdk-pixbuf-2.0/2.10.0"
+gdk_pixbuf_libdir_bundle="lib/gdk-pixbuf-2.0"
 gdk_pixbuf_cache_file_bundle="usr/${gdk_pixbuf_libdir_bundle}/loaders.cache"
 
 mkdir -p "usr/${gdk_pixbuf_libdir_bundle}"
@@ -364,7 +398,7 @@ echo ""
 # Copy the pixmap theme engine
 mkdir -p usr/lib/gtk-2.0/engines
 gtk_libdir="$(pkg-config --variable=libdir gtk+-2.0)"
-pixmap_lib="$(find "${gtk_libdir}/gtk-2.0" -name libpixmap.so)"
+pixmap_lib="$(find \"${gtk_libdir}/gtk-2.0\" -name libpixmap.so)"
 if [[ x"${pixmap_lib}" != "x" ]]; then
     cp -L "${pixmap_lib}" usr/lib/gtk-2.0/engines
 fi
@@ -380,16 +414,6 @@ echo ""
 mkdir -p usr/share
 cp -a /usr/share/mime usr/share || exit 1
 
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy RT's share folder"
-echo ""
-
-# Copy RT's share folder
-mkdir -p usr/share
-cp -a "/$PREFIX/share/rawtherapee" usr/share || exit 1
 
 
 echo ""
@@ -474,8 +498,8 @@ echo "Patch away absolute paths"
 echo ""
 
 # Patch away absolute paths; it would be nice if they were relative
-find usr/ -type f -exec sed -i -e 's|/usr/|././/|g' {} \; -exec echo -n "Patched /usr in " \; -exec echo {} \; >& patch1.log
-find usr/ -type f -exec sed -i -e "s|/${PREFIX}/|././/|g" {} \; -exec echo -n "Patched /${PREFIX} in " \; -exec echo {} \; >& patch2.log
+#find usr/ -type f -exec sed -i -e 's|/usr/|././/|g' {} \; -exec echo -n "Patched /usr in " \; -exec echo {} \; >& patch1.log
+#find usr/ -type f -exec sed -i -e "s|/${PREFIX}/|././/|g" {} \; -exec echo -n "Patched /${PREFIX} in " \; -exec echo {} \; >& patch2.log
 
 
 echo ""
@@ -484,15 +508,15 @@ echo ""
 echo "Copy desktop file and application icon"
 
 # Copy desktop and icon file to AppDir for AppRun to pick them up
-mkdir -p usr/share/applications/
-echo "cp \"/${PREFIX}/share/applications/rawtherapee.desktop\" \"usr/share/applications\""
-cp "/${PREFIX}/share/applications/rawtherapee.desktop" "usr/share/applications" || exit 1
+#mkdir -p usr/share/applications/
+#echo "cp \"/${PREFIX}/share/applications/rawtherapee.desktop\" \"usr/share/applications\""
+#cp "/${PREFIX}/share/applications/rawtherapee.desktop" "usr/share/applications" || exit 1
 
 # Copy hicolor icon theme
 mkdir -p usr/share/icons
 echo "cp -r \"/${PREFIX}/share/icons/\"* \"usr/share/icons\""
 cp -r "/${PREFIX}/share/icons/"* "usr/share/icons" || exit 1
-echo ""
+#echo ""
 
 
 echo ""
@@ -504,9 +528,12 @@ echo ""
 # TODO Might want to "|| exit 1" these, and generate_status
 #get_apprun || exit 1
 cp -a "${AI_SCRIPTS_DIR}/AppRun" . || exit 1
-cp -a "${AI_SCRIPTS_DIR}/fixes.sh" . || exit 1
+#cp -a "${AI_SCRIPTS_DIR}/fixes.sh" . || exit 1
+wget -q https://raw.githubusercontent.com/aferrero2707/appimage-helper-scripts/master/apprun-helper.sh -O "./apprun-helper.sh" || exit 1
 get_desktop || exit 1
 get_icon || exit 1
+
+#exit
 
 
 echo ""
@@ -581,18 +608,14 @@ echo ""
 # Strip binaries.
 strip_binaries
 
-cd "$APPIMAGEBASE"
-rm -f "${APP}.tgz"
-tar czf "${APP}.tgz" "${APP}.AppDir"
-ls -lh "${APP}.tgz"
-transfer "${APP}.tgz"
-printf '%s\n' "" "The .tgz has been uploaded to the URL above." ""
-
-
-
-
+export GIT_DESCRIBE=$(cd /sources && git describe)
 echo "RT_BRANCH: ${RT_BRANCH}"
+echo "GIT_DESCRIBE: ${GIT_DESCRIBE}"
+
+
+
 # Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
+cd "$APPIMAGEBASE"
 glibcVer="$(glibc_needed)"
 #ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
 if [ "x${RT_BRANCH}" = "xreleases" ]; then
@@ -601,14 +624,21 @@ if [ "x${RT_BRANCH}" = "xreleases" ]; then
 else
 	ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
 fi
-ARCH="x86_64"
-VERSION="${ver}"
-VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
+export ARCH="x86_64"
+export VERSION="${ver}"
+export VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
+echo "VERSION:  $VERSION"
+echo "VERSION2: $VERSION2"
 
 yum install -y bsdtar || exit 1
 wd="$(pwd)"
 mkdir -p ../out/
-ARCH="x86_64"
+export NO_GLIBC_VERSION=true
+export DOCKER_BUILD=true
+AI_OUT="../out/${APP}-${VERSION}-${ARCH}.AppImage"
+generate_type2_appimage
+
+if [ "x" = "y" ]; then
 #generate_appimage
 # Download AppImageAssistant
 URL="https://github.com/AppImage/AppImageKit/releases/download/6/AppImageAssistant_6-x86_64.AppImage"
@@ -619,10 +649,10 @@ chmod a+x ./AppImageAssistant
 #./AppImageAssistant --appimage-extract
 mkdir -p ../out || true
 GLIBC_NEEDED=$(glibc_needed)
-AI_OUT="../out/${APP}-${VERSION}.glibc${GLIBC_NEEDED}-${ARCH}.AppImage"
 rm "${AI_OUT}" 2>/dev/null || true
 /tmp/squashfs-root/AppRun ./$APP.AppDir/ "${AI_OUT}"
- 
+fi
+
 ls ../out/*
 
 rm -f ../out/${APP}-${VERSION2}.AppImage
