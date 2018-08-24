@@ -490,6 +490,13 @@ if [[ x"$gomplib" != "x" ]]; then
     cp -L "$gomplib" usr/optional/libstdc++ || exit 1
 fi
 
+atomiclib="$(ldconfig -p | grep 'libatomic.so.1 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
+echo "atomiclib: $atomiclib"
+if [[ x"$atomiclib" != "x" ]]; then
+    mkdir -p usr/optional/libstdc++
+    cp -L "$atomiclib" usr/optional/libstdc++ || exit 1
+fi
+
 
 echo ""
 echo "########################################################################"
