@@ -102,7 +102,7 @@ export LC_ALL="en_US.UTF-8"
 
 
 # Add some required packages
-yum install -y wget curl git lcms2-devel which || exit 1
+yum install -y wget curl git lcms2-devel librsvg2-devel which || exit 1
 
 DO_BUILD=0
 if [ ! -e /work/build.done ]; then
@@ -117,7 +117,7 @@ echo ""
 echo "Installing additional system packages"
 echo ""
 
-(cd /work && rm -rf libiptcdata* && wget https://sourceforge.net/projects/libiptcdata/files/libiptcdata/1.0.4/libiptcdata-1.0.4.tar.gz && tar xzvf libiptcdata-1.0.4.tar.gz && cd libiptcdata-1.0.4 && ./configure --prefix=/$AIPREFIX && make -j 2 install) || exit 1
+(cd /work && rm -rf libiptcdata* && wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/libiptcdata/1.0.4-6ubuntu1/libiptcdata_1.0.4.orig.tar.gz && tar xzvf libiptcdata_1.0.4.orig.tar.gz && cd libiptcdata-1.0.4 && ./configure --prefix=/$AIPREFIX && make -j 2 install) || exit 1
 
 
 # Install missing six python module
@@ -167,8 +167,10 @@ echo ""
 # Lensfun build and install
 cd /work || exit 1
 rm -rf lensfun*
-wget "https://sourceforge.net/projects/lensfun/files/$LFV/lensfun-${LFV}.tar.gz"
-tar xzvf "lensfun-${LFV}.tar.gz"
+#wget "https://sourceforge.net/projects/lensfun/files/$LFV/lensfun-${LFV}.tar.gz"
+#tar xzvf "lensfun-${LFV}.tar.gz"
+wget https://launchpad.net/ubuntu/+archive/primary/+sourcefiles/lensfun/0.3.2-4/lensfun_0.3.2.orig.tar.gz
+tar xzvf "lensfun_0.3.2.orig.tar.gz"
 cd "lensfun-${LFV}" || exit 1
 patch -p1 < $AI_SCRIPTS_DIR/lensfun-glib-libdir.patch
 mkdir -p build
@@ -298,9 +300,12 @@ echo "Copy dependencies"
 echo ""
 
 # Manually copy librsvg, because it is not picked automatically by copy_deps
-#mkdir -p ./usr/lib
-#echo "cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib"
-#cp -a /$PREFIX/lib/librsvg-2.so* ./usr/lib
+mkdir -p ./usr/lib
+RSVG_LIBDIR=$(pkg-config --variable=libdir librsvg-2.0)
+if [ x"${RSVG_LIBDIR}" != "x" ]; then
+	echo "cp -a ${RSVG_LIBDIR}/librsvg*.so* ./usr/lib"
+	cp -a "${RSVG_LIBDIR}"/librsvg*.so* ./usr/lib
+fi
 #echo "ls ./usr/lib:"
 #ls ./usr/lib
 
