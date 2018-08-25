@@ -380,13 +380,15 @@ gdk_pixbuf_cache_file_bundle="usr/${gdk_pixbuf_libdir_bundle}/loaders.cache"
 mkdir -p "usr/${gdk_pixbuf_libdir_bundle}"
 cp -a "$gdk_pixbuf_moduledir" "usr/${gdk_pixbuf_libdir_bundle}"
 cp -a "$gdk_pixbuf_cache_file" "usr/${gdk_pixbuf_libdir_bundle}"
+sed -i -e "s|${gdk_pixbuf_moduledir}/||g" "$gdk_pixbuf_cache_file_bundle"
+
 
 # TODO Check this, was:
 #for m in $(ls "usr/${gdk_pixbuf_libdir_bundle}"/loaders/*.so); do
-for m in "usr/${gdk_pixbuf_libdir_bundle}/loaders/"*.so; do
-    sofile="$(basename "$m")"
-    sed -i -e "s|${gdk_pixbuf_moduledir}/${sofile}|./${gdk_pixbuf_libdir_bundle}/loaders/${sofile}|g" "$gdk_pixbuf_cache_file_bundle"
-done
+#for m in "usr/${gdk_pixbuf_libdir_bundle}/loaders/"*.so; do
+#    sofile="$(basename "$m")"
+#    sed -i -e "s|${gdk_pixbuf_moduledir}/${sofile}|./${gdk_pixbuf_libdir_bundle}/loaders/${sofile}|g" "$gdk_pixbuf_cache_file_bundle"
+#done
 
 printf '%s\n' "" "==================" "gdk-pixbuf cache:"
 cat "$gdk_pixbuf_cache_file_bundle"
