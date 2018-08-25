@@ -380,7 +380,7 @@ gdk_pixbuf_cache_file_bundle="usr/${gdk_pixbuf_libdir_bundle}/loaders.cache"
 mkdir -p "usr/${gdk_pixbuf_libdir_bundle}"
 cp -a "$gdk_pixbuf_moduledir" "usr/${gdk_pixbuf_libdir_bundle}"
 cp -a "$gdk_pixbuf_cache_file" "usr/${gdk_pixbuf_libdir_bundle}"
-sed -i -e "s|${gdk_pixbuf_moduledir}/||g" "$gdk_pixbuf_cache_file_bundle"
+sed -i -e "s|${gdk_pixbuf_moduledir}|LOADERSDIR|g" "$gdk_pixbuf_cache_file_bundle"
 
 
 # TODO Check this, was:
@@ -680,8 +680,8 @@ mv "${AI_OUT}" ../out/${APP}-${VERSION2}.AppImage
 
 pwd
 ls ../out/*
-transfer ../out/*
-echo ""
-echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
+#transfer ../out/*
+#echo ""
+#echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
 mkdir -p /sources/out
 cp ../out/${APP}-${VERSION2}.AppImage /sources/out

@@ -21,8 +21,12 @@ export XDG_DATA_DIRS="${APPDIR}/usr/share/:${APPDIR}/usr/share/mime/:${XDG_DATA_
 export GTK_PATH="${APPDIR}/usr/lib/gtk-2.0:${GTK_PATH}"
 export PANGO_LIBDIR="${APPDIR}/usr/lib"
 export GCONV_PATH="${APPDIR}/usr/lib/gconv"
-export GDK_PIXBUF_MODULEDIR="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders"
-export GDK_PIXBUF_MODULE_FILE="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders.cache"
+#export GDK_PIXBUF_MODULEDIR="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders"
+#export GDK_PIXBUF_MODULE_FILE="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders.cache"
+mkdir -p "$AILIBDIR/gdk-pixbuf-2.0"
+cp "${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders.cache" "$AILIBDIR/gdk-pixbuf-2.0"
+sed -i -e "s|LOADERSDIR|${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders|g" "$AILIBDIR/gdk-pixbuf-2.0/loaders.cache"
+export GDK_PIXBUF_MODULE_FILE="$AILIBDIR/gdk-pixbuf-2.0/loaders.cache"
 
 #if [[ -e /etc/fonts/fonts.conf ]]; then
 #  export FONTCONFIG_PATH=/etc/fonts
