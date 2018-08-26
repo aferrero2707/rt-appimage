@@ -44,6 +44,12 @@ ldd "${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders/libpixbufloader-svg.so"
 echo ""
 echo "=========="
 echo ""
+echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
+find "$APPDIR" -name "librsvg*.so*"
+/sbin/ldconfig -p | grep 'librsvg'
+echo ""
+echo "=========="
+echo ""
 if [ x"$1" = "x--cli" ]; then
 	shift
 	"${APPDIR}/usr/bin/rawtherapee-cli" "$@"
