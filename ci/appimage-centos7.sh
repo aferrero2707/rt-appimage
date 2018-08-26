@@ -33,10 +33,13 @@ export AI_SCRIPTS_DIR="/sources/ci"
 
 # Get the latest version of the AppImage helper functions,
 # or use a fallback copy if not available:
-if ! wget "https://github.com/probonopd/AppImages/raw/master/functions.sh" --output-document="./functions.sh"; then
-    cp -a "${TRAVIS_BUILD_DIR}/ci/functions.sh" ./functions.sh || exit 1
-fi
-
+#if ! wget "https://github.com/probonopd/AppImages/raw/master/functions.sh" --output-document="./functions.sh"; then
+#    cp -a "${TRAVIS_BUILD_DIR}/ci/functions.sh" ./functions.sh || exit 1
+#fi
+rm -f "./functions.sh"
+wget "https://github.com/aferrero2707/appimage-helper-scripts/raw/master/functions.sh" --output-document="./functions.sh" || exit 1
+#cat "./functions.sh"
+#cp /sources/ci/functions.sh "./functions.sh"
 # Source the script:
 . ./functions.sh
 
@@ -53,19 +56,6 @@ echo ""
 ########################################################################
 # Additional helper functions:
 ########################################################################
-
-# Delete blacklisted libraries
-delete_blacklisted_custom()
-{
-    printf '%s\n' "APPIMAGEBASE: ${APPIMAGEBASE}"
-    ls "${APPIMAGEBASE}"
-
-    while IFS= read -r line; do
-        find . -type f -name "${line}" -delete
-    done < <(cat "$APPIMAGEBASE/excludelist" | sed '/^[[:space:]]*$/d' | sed '/^#.*$/d')
-    # TODO Try this, its cleaner if it works:
-    #done < "$APPIMAGEBASE/excludelist" | sed '/^[[:space:]]*$/d' | sed '/^#.*$/d'
-}
 
 
 # Remove absolute paths from pango modules cache (if existing)
@@ -315,7 +305,7 @@ fi
 
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
-copy_deps; copy_deps; copy_deps;
+copy_deps2; copy_deps2; copy_deps2;
 
 #exit
 
@@ -455,8 +445,8 @@ echo ""
 
 # Delete dangerous libraries; see
 # https://github.com/probonopd/AppImages/blob/master/excludelist
-delete_blacklisted_custom
-
+delete_blacklisted2
+#exit
 
 echo ""
 echo "########################################################################"

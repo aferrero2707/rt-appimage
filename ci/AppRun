@@ -8,7 +8,9 @@ link_libraries
 echo "AILIBDIR=$AILIBDIR"
 fix_libxcb_dri3
 fix_stdlibcxx
-fix_fontconfig
+#fix_fontconfig
+fix_library "libfontconfig"
+fix_library "libfreetype"
 #exit
 
 #cd "$HERE"
@@ -35,6 +37,13 @@ export GDK_PIXBUF_MODULE_FILE="$AILIBDIR/gdk-pixbuf-2.0/loaders.cache"
 
 
 ldd "${APPDIR}/usr/bin/rawtherapee"
+echo ""
+echo "=========="
+echo ""
+ldd "${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders/libpixbufloader-svg.so"
+echo ""
+echo "=========="
+echo ""
 if [ x"$1" = "x--cli" ]; then
 	shift
 	"${APPDIR}/usr/bin/rawtherapee-cli" "$@"
