@@ -92,7 +92,7 @@ export LC_ALL="en_US.UTF-8"
 
 
 # Add some required packages
-yum install -y wget curl git lcms2-devel librsvg2-devel which || exit 1
+yum install -y wget curl git lcms2-devel gtk-doc libcroco-devel which || exit 1
 
 DO_BUILD=0
 if [ ! -e /work/build.done ]; then
@@ -146,6 +146,19 @@ rm -rf tiff*
 wget http://download.osgeo.org/libtiff/tiff-4.0.9.tar.gz || exit 1
 tar xvf tiff-4.0.9.tar.gz || exit 1
 (cd "tiff-4.0.9" && ./configure --prefix=/$AIPREFIX && make -j 2 install) || exit 1
+
+
+echo ""
+echo "########################################################################"
+echo ""
+echo "Building and installing librsvg"
+echo ""
+
+cd /work || exit 1
+curl https://sh.rustup.rs -sSf > ./r.sh && bash ./r.sh -y
+export PATH=$HOME/.cargo/bin:$PATH
+(rm -rf librsvg* && wget http://ftp.gnome.org/pub/gnome/sources/librsvg/2.40/librsvg-2.40.16.tar.xz && tar xvf librsvg-2.40.16.tar.xz && cd librsvg-2.40.16 && ./configure --prefix=/$AIPREFIX && make -j 2 install) || exit 1
+
 
 LFV=0.3.2
 echo ""
