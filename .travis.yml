@@ -6,9 +6,9 @@ sudo: required
 services: docker
 env: 
   - RT_BRANCH=dev
-  #- RT_BRANCH=newlocallab
-  #- RT_BRANCH=waveletnew
-  #- RT_BRANCH=releases
+  - RT_BRANCH=newlocallab
+  - RT_BRANCH=waveletnew
+  - RT_BRANCH=releases
 
 before_script:
   - git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
@@ -32,7 +32,7 @@ after_success:
   - ls -lh
   - ls -lh out/* # Assuming you have some files in out/ that you would like to upload
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/remove.sh
-  #- TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee-${RT_BRANCH}-" ".AppImage"
+  - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee-${RT_BRANCH}-" ".AppImage"
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
   - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash  ./upload_rotate.sh "nightly" out/* >& /dev/null
   - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash  ./upload_rotate.sh "nightly" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash >& /dev/null
