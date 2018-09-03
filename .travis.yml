@@ -16,9 +16,9 @@ before_script:
   - cp -a ci RawTherapee
   - cd RawTherapee
   - bash ci/check_commit.sh ${RT_BRANCH}
-  #- 'if [ -e travis.cancel ]; then
-  #      exit 0;
-  #  fi'
+  - 'if [ -e travis.cancel ]; then
+        exit 0;
+    fi'
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
   - python support/travis_blocking_stdout.py
   #- travis_wait 120 sleep infinity & sudo docker pull photoflow/docker-trusty-gtk3

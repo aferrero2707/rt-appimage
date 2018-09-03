@@ -1,10 +1,17 @@
 # This file is supposed to be sourced by each Recipe
 # that wants to use the functions contained herein
 # like so:
-# wget -q https://github.com/AppImage/AppImages/raw/master/functions.sh -O ./functions.sh
+# wget -q https://github.com/AppImage/AppImages/raw/${PKG2AICOMMIT}/functions.sh -O ./functions.sh
 # . ./functions.sh
 
 # RECIPE=$(realpath "$0")
+
+# Specify a certain commit if you do not want to use master
+# by using:
+# export PKG2AICOMMIT=<git sha>
+if [ -z "$PKG2AICOMMIT" ] ; then
+  PKG2AICOMMIT=master
+fi
 
 # Options for apt-get to use local files rather than the system ones
 OPTIONS="-o Debug::NoLocking=1
@@ -34,7 +41,7 @@ case "$(uname -i)" in
 #  arm*)
 #    echo "ARM system architecture"
 #    SYSTEM_ARCH="";;
-  unknown)
+  unknown|AuthenticAMD|GenuineIntel)
 #         uname -i not answer on debian, then:
     case "$(uname -m)" in
       x86_64|amd64)
@@ -98,6 +105,54 @@ copy_deps()
   rm -f DEPSFILE
 }
 
+# Copy the library dependencies of all exectuable files in the current directory
+# (it can be beneficial to run this multiple times)
+copy_deps2()
+{
+  mkdir -p usr/lib
+  PWD=$(readlink -f .)
+  FILES=$(find . -type f -executable -or -name *.so.* -or -name *.so | sort | uniq )
+  for FILE in $FILES ; do
+    ldd "${FILE}" | grep "=>" | awk '{print $3}' | xargs -I '{}' echo '{}' >> DEPSFILE
+  done
+  DEPS=$(cat DEPSFILE | sort | uniq)
+  for FILE in $DEPS ; do
+    if [ -e $FILE ] && [[ $(readlink -f $FILE)/ != $PWD/* ]] ; then
+      echo "Copying library \"$FILE\"..."
+      PARENT=""
+      if [[ -h "$FILE" ]]; then
+        PARENT=$(readlink "$FILE")
+      fi
+      #echo "  parent: $PARENT"
+      while [ -n "$PARENT" ]; do
+        DIR=$(dirname "$FILE")
+        PDIR=$(dirname "$PARENT")
+        if [ "$PDIR" != "." ]; then
+          cp -v -L "$FILE" ./usr/lib
+        else
+          cp -v -a "$FILE" ./usr/lib
+        fi
+        
+        ROOT=$(echo "$PARENT" | cut -c 1)
+        if [ x"$ROOT" != "x/" ]; then
+          FILE="$DIR/$PARENT"
+        else
+          FILE="$PARENT"
+        fi
+        
+        #echo "  file: $FILE"
+        PARENT=""
+        if [[ -h "$FILE" ]]; then
+          PARENT=$(readlink "$FILE")
+        fi
+        #echo "  parent: $PARENT"
+      done
+      cp -v -a "$FILE" ./usr/lib
+    fi
+  done
+  rm -f DEPSFILE
+}
+
 # Move ./lib/ tree to ./usr/lib/
 move_lib()
 {
@@ -108,7 +163,7 @@ move_lib()
 # Delete blacklisted files
 delete_blacklisted()
 {
-  BLACKLISTED_FILES=$(cat_file_from_url https://github.com/AppImage/AppImages/raw/master/excludelist | sed 's|#.*||g')
+  BLACKLISTED_FILES=$(cat_file_from_url https://github.com/AppImage/AppImages/raw/${PKG2AICOMMIT}/excludelist | sed 's|#.*||g')
   echo $BLACKLISTED_FILES
   for FILE in $BLACKLISTED_FILES ; do
     FILES="$(find . -name "${FILE}" -not -path "./usr/optional/*")"
@@ -124,10 +179,33 @@ delete_blacklisted()
   find . -name '*.la' | xargs -i rm {}
 }
 
+
+# Delete blacklisted libraries
+delete_blacklisted2()
+{
+    printf '%s\n' "APPIMAGEBASE: ${APPIMAGEBASE}"
+    ls "${APPIMAGEBASE}"
+
+	pwd
+    while IFS= read -r line; do
+        #echo "line: ${line}"
+        #find . -name "${line}*"
+        #find . -name "${line}*" -delete
+        FLIST=$(find . -name "${line}*")
+        for F in $FLIST; do
+          rm -v -f "$F"
+        done
+    done < <(cat "$APPIMAGEBASE/excludelist" | sed '/^[[:space:]]*$/d' | sed '/^#.*$/d')
+    # TODO Try this, its cleaner if it works:
+    #done < "$APPIMAGEBASE/excludelist" | sed '/^[[:space:]]*$/d' | sed '/^#.*$/d'
+}
+
+
 # Echo highest glibc version needed by the executable files in the current directory
 glibc_needed()
 {
-  find . -name *.so -or -name *.so.* -or -type f -executable  -exec readelf -s '{}' 2>/dev/null \; | sed -n 's/.*@GLIBC_//p'| awk '{print $1}' | sort --version-sort | tail -n 1
+  find . -name *.so -or -name *.so.* -or -type f -executable  -exec strings {} \; | grep ^GLIBC_2 | sed s/GLIBC_//g | sort --version-sort | uniq | tail -n 1
+  # find . -name *.so -or -name *.so.* -or -type f -executable  -exec readelf -s '{}' 2>/dev/null \; | sed -n 's/.*@GLIBC_//p'| awk '{print $1}' | sort --version-sort | tail -n 1
 }
 # Add desktop integration
 # Usage: get_desktopintegration name_of_desktop_file_and_exectuable
@@ -176,7 +254,7 @@ generate_appimage()
 
   mkdir -p ../out || true
   rm ../out/$APP"-"$VERSION".glibc"$GLIBC_NEEDED"-"$ARCH".AppImage" 2>/dev/null || true
-  GLIBC_NEEDED=${GLIBC_NEEDED:=$(glibc_needed)}
+  GLIBC_NEEDED=$(glibc_needed)
   ./AppImageAssistant ./$APP.AppDir/ ../out/$APP"-"$VERSION".glibc"$GLIBC_NEEDED"-"$ARCH".AppImage"
 }
 
@@ -204,6 +282,7 @@ generate_type2_appimage()
     appimagetool_tempdir=$(mktemp -d)
     mv appimagetool "$appimagetool_tempdir"
     pushd "$appimagetool_tempdir" &>/dev/null
+    ls -al
     ./appimagetool --appimage-extract
     rm appimagetool
     appimagetool=$(readlink -f squashfs-root/AppRun)
@@ -213,22 +292,22 @@ generate_type2_appimage()
   fi
 
   if [ -z ${NO_GLIBC_VERSION+true} ]; then
+    GLIBC_NEEDED=$(glibc_needed)
     VERSION_EXPANDED=$VERSION.glibc$GLIBC_NEEDED
   else
     VERSION_EXPANDED=$VERSION
   fi
 
   set +x
+  GLIBC_NEEDED=$(glibc_needed)
   if ( [ ! -z "$KEY" ] ) && ( ! -z "$TRAVIS" ) ; then
     wget https://github.com/AppImage/AppImageKit/files/584665/data.zip -O data.tar.gz.gpg
     ( set +x ; echo $KEY | gpg2 --batch --passphrase-fd 0 --no-tty --skip-verify --output data.tar.gz --decrypt data.tar.gz.gpg )
     tar xf data.tar.gz
     sudo chown -R $USER .gnu*
     mv $HOME/.gnu* $HOME/.gnu_old ; mv .gnu* $HOME/
-    GLIBC_NEEDED=${GLIBC_NEEDED:=$(glibc_needed)}
     VERSION=$VERSION_EXPANDED "$appimagetool" $@ -n -s --bintray-user $BINTRAY_USER --bintray-repo $BINTRAY_REPO -v ./$APP.AppDir/
   else
-    GLIBC_NEEDED=${GLIBC_NEEDED:=$(glibc_needed)}
     VERSION=$VERSION_EXPANDED "$appimagetool" $@ -n --bintray-user $BINTRAY_USER --bintray-repo $BINTRAY_REPO -v ./$APP.AppDir/
   fi
   set -x
@@ -244,7 +323,7 @@ generate_status()
   mkdir -p ./tmp/archives/
   mkdir -p ./tmp/lists/partial
   touch tmp/pkgcache.bin tmp/srcpkgcache.bin
-  wget -q -c "https://github.com/AppImage/AppImages/raw/master/excludedeblist"
+  wget -q -c "https://github.com/AppImage/AppImages/raw/${PKG2AICOMMIT}/excludedeblist"
   rm status 2>/dev/null || true
   for PACKAGE in $(cat excludedeblist | cut -d "#" -f 1) ; do
     printf "Package: $PACKAGE\nStatus: install ok installed\nArchitecture: all\nVersion: 9:999.999.999\n\n" >> status
@@ -282,7 +361,7 @@ get_version()
   if [ -z "$THEDEB" ] ; then
     echo "Version could not be determined from the .deb; you need to determine it manually"
   fi
-  VERSION=$(echo $THEDEB | cut -d "~" -f 1 | cut -d "_" -f 2 | cut -d "-" -f 1 | sed -e 's|1%3a||g' | sed -e 's|+dfsg||g' )
+  VERSION=$(echo $THEDEB | cut -d "~" -f 1 | cut -d "_" -f 2 | cut -d "-" -f 1 | sed -e 's|1%3a||g' | sed -e 's|.dfsg||g' )
   echo $VERSION
 }
 
