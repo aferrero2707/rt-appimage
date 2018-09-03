@@ -92,7 +92,14 @@ export LC_ALL="en_US.UTF-8"
 
 
 # Add some required packages
-yum install -y wget curl git lcms2-devel gtk-doc libcroco-devel which || exit 1
+yum install -y https://centos7.iuscommunity.org/ius-release.rpm || exit 1
+yum update -y || exit 1
+yum install -y libcroco-devel which python36u python36u-libs python36u-devel python36u-pip || exit 1
+
+cd /usr/bin
+ln -f -s python3.6 python3
+ln -f -s python3.6-config python3-config
+#exit 0
 
 DO_BUILD=0
 if [ ! -e /work/build.done ]; then
@@ -615,6 +622,10 @@ echo ""
 # ImportError: /usr/lib/x86_64-linux-gnu/libgdk-x11-2.0.so.0: undefined symbol: XRRGetMonitors
 cp "$(ldconfig -p | grep libgdk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/lib/
 cp "$(ldconfig -p | grep libgtk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/lib/
+
+
+cd /work && rm -rf appimage-helper-scripts && git clone https://github.com/aferrero2707/appimage-helper-scripts.git && cd appimage-helper-scripts/appimage-exec-wrapper2 && make && cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
+
 
 
 echo ""

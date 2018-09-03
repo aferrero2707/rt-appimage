@@ -54,7 +54,7 @@ if [ x"$1" = "x--cli" ]; then
 	shift
 	"${APPDIR}/usr/bin/rawtherapee-cli" "$@"
 else
-	"${APPDIR}/usr/bin/rawtherapee.wrapper" "$@"
+	LD_PRELOAD="${APPDIR}/usr/lib/exec_wrapper2.so" "${APPDIR}/usr/bin/rawtherapee.wrapper" "$@"
 #valgrind --tool=callgrind --instr-atstart=no "./bin/rawtherapee" "$@"
 fi
 
