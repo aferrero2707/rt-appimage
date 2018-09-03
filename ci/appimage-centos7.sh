@@ -625,7 +625,7 @@ cp "$(ldconfig -p | grep libgdk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/l
 cp "$(ldconfig -p | grep libgtk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/lib/
 
 
-cd /work && rm -rf appimage-helper-scripts && git clone https://github.com/aferrero2707/appimage-helper-scripts.git && cd appimage-helper-scripts/appimage-exec-wrapper2 && make && cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
+(cd /work && rm -rf appimage-helper-scripts && git clone https://github.com/aferrero2707/appimage-helper-scripts.git && cd appimage-helper-scripts/appimage-exec-wrapper2 && make && cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
 
 
 
