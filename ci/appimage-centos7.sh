@@ -607,6 +607,7 @@ echo "Update LensFun database"
 echo ""
 
 # Update the Lensfun database and put the newest version into the bundle
+export PYTHONPATH=/$PREFIX/lib/python3.6/site-packages:$PYTHONPATH
 "/$PREFIX/bin/lensfun-update-data"
 mkdir -p usr/share/lensfun/version_1
 if [ -e /var/lib/lensfun-updates/version_1 ]; then
