@@ -2,7 +2,10 @@
 HERE="$(dirname "$(readlink -f "${0}")")"
 export APPDIR="$HERE"
 
+#export APPIMAGE_CHECKRT_DEBUG=1
+
 source "$APPDIR/apprun-helper.sh"
+save_environment
 make_temp_libdir
 link_libraries
 echo "AILIBDIR=$AILIBDIR"
@@ -59,3 +62,4 @@ else
 fi
 
 rm -rf "$AILIBDIR"
+rm -f "$AIPENV"
