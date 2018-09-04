@@ -243,6 +243,7 @@ cmake \
     -DCMAKE_INSTALL_PREFIX="/${PREFIX}/rt" \
     -DBUNDLE_BASE_INSTALL_DIR="/${PREFIX}/rt/bin" \
     -DDATADIR=".." \
+    -DLENSFUNDBDIR="share/lensfun/version_1" \
     -DOPTION_OMP="ON" \
     -DWITH_LTO="OFF" \
     -DWITH_PROF="OFF" \
