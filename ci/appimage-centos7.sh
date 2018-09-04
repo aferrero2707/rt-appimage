@@ -36,12 +36,22 @@ export AI_SCRIPTS_DIR="/sources/ci"
 #if ! wget "https://github.com/probonopd/AppImages/raw/master/functions.sh" --output-document="./functions.sh"; then
 #    cp -a "${TRAVIS_BUILD_DIR}/ci/functions.sh" ./functions.sh || exit 1
 #fi
-rm -f "./functions.sh"
-wget "https://github.com/aferrero2707/appimage-helper-scripts/raw/master/functions.sh" --output-document="./functions.sh" || exit 1
+
+mkdir -p /work || exit 1
+cd /work || exit 1
+rm -rf appimage-helper-scripts
+git clone https://github.com/aferrero2707/appimage-helper-scripts.git  || exit 1
+cd appimage-helper-scripts || exit 1
+# Source the script:
+source ./functions.sh
+
+
+#rm -f "./functions.sh"
+#wget "https://github.com/aferrero2707/appimage-helper-scripts/raw/master/functions.sh" --output-document="./functions.sh" || exit 1
 #cat "./functions.sh"
 #cp /sources/ci/functions.sh "./functions.sh"
 # Source the script:
-. ./functions.sh
+#. ./functions.sh
 
 echo ""
 echo "########################################################################"
@@ -223,7 +233,7 @@ echo ""
 
 cd /sources
 export GIT_DESCRIBE=$(git describe)
-
+patch -N -p0 /sources/ci/rt-lensfundbdir.patch || exit 1
 
 # RawTherapee build and install
 if [ x"${RT_BRANCH}" = "xreleases" ]; then
@@ -555,7 +565,8 @@ echo ""
 #get_apprun || exit 1
 cp -a "${AI_SCRIPTS_DIR}/AppRun" . || exit 1
 #cp -a "${AI_SCRIPTS_DIR}/fixes.sh" . || exit 1
-wget -q https://raw.githubusercontent.com/aferrero2707/appimage-helper-scripts/master/apprun-helper.sh -O "./apprun-helper.sh" || exit 1
+cp -a /work/appimage-helper-scripts/apprun-helper.sh "./apprun-helper.sh" || exit 1
+#wget -q https://raw.githubusercontent.com/aferrero2707/appimage-helper-scripts/master/apprun-helper.sh -O "./apprun-helper.sh" || exit 1
 get_desktop || exit 1
 get_icon || exit 1
 
@@ -626,7 +637,7 @@ cp "$(ldconfig -p | grep libgdk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/l
 cp "$(ldconfig -p | grep libgtk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/lib/
 
 
-(cd /work && rm -rf appimage-helper-scripts && git clone https://github.com/aferrero2707/appimage-helper-scripts.git && cd appimage-helper-scripts/appimage-exec-wrapper2 && make && cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
+(cd /work/appimage-helper-scripts/appimage-exec-wrapper2 && make && cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
 
 
 
@@ -661,7 +672,6 @@ export VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
 echo "VERSION:  $VERSION"
 echo "VERSION2: $VERSION2"
 
-yum install -y bsdtar || exit 1
 wd="$(pwd)"
 mkdir -p ../out/
 export NO_GLIBC_VERSION=true
