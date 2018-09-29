@@ -51,13 +51,13 @@
 	if [ x"$LATEST" != "x" ]; then
 		ID=$(echo "$LATEST" | cut -d'@' -f 2)
 		AI=$(echo "$LATEST" | cut -d'@' -f 1)
-		ASSETS="$AI%${APP}-${VERSION}"
+		ASSETS="$AI%${AINAME}"
 		#echo "$AI" > assets.txt
 		#echo "${APP}-${VERSION}" >> assets.txt
 		NEWEST="$(echo "$ASSETS" | tr '%' '\n' | sort | tail -n 1)"
 		#echo "CURRENT: ${APP}-${VERSION}"
 		#echo "NEWEST: $NEWEST"
-		if [ "$NEWEST" == "${APP}-${VERSION}" ]; then
+		if [ "$NEWEST" == "${AINAME}" ]; then
 			#echo "Package is already at the latest version"
 			exit
 		fi

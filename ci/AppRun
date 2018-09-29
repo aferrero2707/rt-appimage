@@ -31,13 +31,14 @@ if [ x"$DO_UPDATE" = "x1" ]; then
 
 	APP=$(cat "$APPDIR/VERSION.txt" | head -n 1)
 	VERSION=$(cat "$APPDIR/VERSION.txt" | head -n 2 | tail -n 1)
+	AINAME=$(cat "$APPDIR/VERSION.txt" | head -n 3 | tail -n 1)
 
 	REPO_SLUG="Beep6581/RawTherapee" #"$1"
 	#REPO_SLUG="aferrero2707/lhdr-appimage" #"Beep6581/RawTherapee" #"$1"
 	#APP=luminance-hdr #$3
 	RELEASE_TAG="nightly" #"$2"
 
-	LATEST=$("$APPDIR/check_updates.sh" "$APP" "$VERSION" "$REPO_SLUG" "$RELEASE_TAG")
+	LATEST=$("$APPDIR/check_updates.sh" "$AINAME" "$REPO_SLUG" "$RELEASE_TAG")
 	if [ x"$LATEST" != "x" ]; then
 		ID=$(echo "$LATEST" | cut -d'@' -f 2)
 		AI=$(echo "$LATEST" | cut -d'@' -f 1)
