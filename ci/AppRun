@@ -1,37 +1,94 @@
 #!/usr/bin/env bash
 HERE="$(dirname "$(readlink -f "${0}")")"
-export APPDIR="$HERE"
 
 #export APPIMAGE_CHECKRT_DEBUG=1
+
+
+export APPDIR="$HERE"
+
+DO_UPDATE=0
+if [ x"$1" = "x--update" ]; then
+	DO_UPDATE=1
+	shift
+fi
+
 
 source "$APPDIR/apprun-helper.sh"
 save_environment
 make_temp_libdir
 link_libraries
 echo "AILIBDIR=$AILIBDIR"
+#export APPDIR2=$AILIBDIR
 fix_libxcb_dri3
 fix_stdlibcxx
 #fix_fontconfig
 fix_library "libfontconfig"
 fix_library "libfreetype"
+
+
+
+if [ x"$DO_UPDATE" = "x1" ]; then
+
+	APP=$(cat "$APPDIR/VERSION.txt" | head -n 1)
+	VERSION=$(cat "$APPDIR/VERSION.txt" | head -n 2 | tail -n 1)
+
+	REPO_SLUG="Beep6581/RawTherapee" #"$1"
+	#REPO_SLUG="aferrero2707/lhdr-appimage" #"Beep6581/RawTherapee" #"$1"
+	#APP=luminance-hdr #$3
+	RELEASE_TAG="nightly" #"$2"
+
+	LATEST=$("$APPDIR/check_updates.sh" "$APP" "$VERSION" "$REPO_SLUG" "$RELEASE_TAG")
+	if [ x"$LATEST" != "x" ]; then
+		ID=$(echo "$LATEST" | cut -d'@' -f 2)
+		AI=$(echo "$LATEST" | cut -d'@' -f 1)
+		#echo "./download_release.sh \"$REPO_SLUG\" \"$AI\" \"$ID\""
+		"$APPDIR/usr/bin/zenity.sh"  --question --text "New version available:\n\nhttps://github.com/${REPO_SLUG}/releases/${RELEASE_TAG}/${AI}\n\nDo you want to download and run it?\nThe new package will be stored in $HOME/.local/appimages"
+		ANSWER=$?
+		if [ x"$ANSWER" = "x0" ]; then
+			mkdir -p "$HOME/.local/appimages" || exit 1
+			asset_url="https://api.github.com/repos/$REPO_SLUG/releases/assets/$ID"
+			printf '%s\n' "" \
+				"Downloading latest RawTherapee AppImage" \
+				"    From: ${asset_url}" \
+				"      To: $HOME/.local/appimages/$AI" \
+				"Progress:"
+			curl -XGET -o "$HOME/.local/appimages/$AI" --location --header "Accept: application/octet-stream" "${asset_url}"
+			printf '\n'
+			chmod u+x "$HOME/.local/appimages/$AI"
+			"$HOME/.local/appimages/$AI"
+			exit
+		fi
+	else
+		echo "Package is already at the latest version"
+	fi
+
+#exit
+
+fi
+
+
+
+export APPDIRS=$APPDIR
+export PATH="$APPDIR/usr/bin:${PATH}:/sbin:/usr/sbin"
+export LD_LIBRARY_PATH="$AILIBDIR:/usr/lib:$LD_LIBRARY_PATH"
+
+init_gtk
 #exit
 
 #cd "$HERE"
 #cd usr
 #HERE="$(pwd)"
+#export XDG_DATA_DIRS="${APPDIR}/usr/share/:${APPDIR}/usr/share/mime/:${XDG_DATA_DIRS}"
+export XDG_DATA_DIRS="${APPDIR}/usr/share/:${XDG_DATA_DIRS}:/usr/local/share/:/usr/share/"
+export ZENITY_DATA_DIR="$APPDIR/usr/share/zenity"
+#export GCONV_PATH="${APPDIR}/usr/lib/gconv"
 
-export PATH="${PATH}:/sbin:/usr/sbin"
-export LD_LIBRARY_PATH="$AILIBDIR:/usr/lib:$LD_LIBRARY_PATH"
-export XDG_DATA_DIRS="${APPDIR}/usr/share/:${APPDIR}/usr/share/mime/:${XDG_DATA_DIRS}"
-export GTK_PATH="${APPDIR}/usr/lib/gtk-2.0:${GTK_PATH}"
-export PANGO_LIBDIR="${APPDIR}/usr/lib"
-export GCONV_PATH="${APPDIR}/usr/lib/gconv"
-#export GDK_PIXBUF_MODULEDIR="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders"
-#export GDK_PIXBUF_MODULE_FILE="${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders.cache"
+if [ "x" = "y" ]; then
 mkdir -p "$AILIBDIR/gdk-pixbuf-2.0"
 cp "${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders.cache" "$AILIBDIR/gdk-pixbuf-2.0"
 sed -i -e "s|LOADERSDIR|${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders|g" "$AILIBDIR/gdk-pixbuf-2.0/loaders.cache"
 export GDK_PIXBUF_MODULE_FILE="$AILIBDIR/gdk-pixbuf-2.0/loaders.cache"
+fi
 
 #if [[ -e /etc/fonts/fonts.conf ]]; then
 #  export FONTCONFIG_PATH=/etc/fonts
@@ -43,16 +100,16 @@ ldd "${APPDIR}/usr/bin/rawtherapee"
 echo ""
 echo "=========="
 echo ""
-ldd "${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders/libpixbufloader-svg.so"
-echo ""
-echo "=========="
-echo ""
+#ldd "${APPDIR}/usr/lib/gdk-pixbuf-2.0/loaders/libpixbufloader-svg.so"
+#echo ""
+#echo "=========="
+#echo ""
 echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-find "$APPDIR" -name "librsvg*.so*"
-/sbin/ldconfig -p | grep 'librsvg'
-echo ""
-echo "=========="
-echo ""
+#find "$APPDIR" -name "librsvg*.so*"
+#/sbin/ldconfig -p | grep 'librsvg'
+#echo ""
+#echo "=========="
+#echo ""
 if [ x"$1" = "x--cli" ]; then
 	shift
 	"${APPDIR}/usr/bin/rawtherapee-cli" "$@"

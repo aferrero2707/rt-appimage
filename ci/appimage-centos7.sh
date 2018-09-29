@@ -102,9 +102,9 @@ export LC_ALL="en_US.UTF-8"
 
 
 # Add some required packages
-yum install -y https://centos7.iuscommunity.org/ius-release.rpm || exit 1
-yum update -y || exit 1
-yum install -y wget curl git lcms2-devel gtk-doc libcroco-devel which python36u python36u-libs python36u-devel python36u-pip || exit 1
+yum install -y https://centos7.iuscommunity.org/ius-release.rpm #|| exit 1
+yum update -y #|| exit 1
+yum install -y wget curl git lcms2-devel gtk-doc libcroco-devel which python36u python36u-libs python36u-devel python36u-pip gnome-common || exit 1
 
 cd /usr/bin
 ln -f -s python3.6 python3
@@ -135,6 +135,20 @@ python get-pip.py
 pip install six || exit 1
 #python3 get-pip.py
 #pip install six || exit 1
+#exit
+
+
+
+
+echo ""
+echo "########################################################################"
+echo ""
+echo "Building and installing zenity"
+echo ""
+
+(cd /work && rm -rf zenity && git clone https://github.com/aferrero2707/zenity.git && \
+cd zenity && ./autogen.sh && ./configure --prefix=/${PREFIX} && make install) || exit 1
+
 #exit
 
 
@@ -233,7 +247,7 @@ echo ""
 
 cd /sources
 export GIT_DESCRIBE=$(git describe)
-patch -N -p0 < /sources/ci/rt-lensfundbdir.patch || exit 1
+#patch -N -p0 < /sources/ci/rt-lensfundbdir.patch || exit 1
 
 # RawTherapee build and install
 if [ x"${RT_BRANCH}" = "xreleases" ]; then
@@ -307,6 +321,9 @@ mkdir -p usr/share
 echo "cp -a \"/$PREFIX/rt\"/* usr"
 cp -a "/$PREFIX/rt"/* usr || exit 1
 
+cp -a /${PREFIX}/bin/zenity usr/bin
+cp -a /${PREFIX}/share/zenity usr/share
+
 # Copy main RT executable into $APPDIR/usr/bin/rawtherapee
 #mkdir -p ./usr/bin
 #echo "cp -a \"/${PREFIX}/rt/bin/${LOWERAPP}\" \"./usr/bin/${LOWERAPP}\""
@@ -320,119 +337,18 @@ echo ""
 echo "Copy dependencies"
 echo ""
 
-# Manually copy librsvg, because it is not picked automatically by copy_deps
-mkdir -p ./usr/lib
-RSVG_LIBDIR=$(pkg-config --variable=libdir librsvg-2.0)
-if [ x"${RSVG_LIBDIR}" != "x" ]; then
-	echo "cp -a ${RSVG_LIBDIR}/librsvg*.so* ./usr/lib"
-	cp -a "${RSVG_LIBDIR}"/librsvg*.so* ./usr/lib
-fi
-#echo "ls ./usr/lib:"
-#ls ./usr/lib
+# Bundle GTK2 stuff
+/work/appimage-helper-scripts/bundle-gtk2.sh
 
-#echo "LD_LIBRARY_PATH: $LD_LIBRARY_PATH"
-#ldd "./usr/bin/${LOWERAPP}"
 
 
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
 copy_deps2; copy_deps2; copy_deps2;
 
-#exit
-
-mkdir -p ./usr/lib
-ls -l ./usr/lib
-
-cp -a ./lib/x86_64-linux-gnu/*.so* ./usr/lib
-rm -rf ./lib/x86_64-linux-gnu
-
-cp -a ./lib/*.so* ./usr/lib
-rm -rf ./lib
-
-cp -a ./lib64/*.so* ./usr/lib
-rm -rf ./lib64
-
-cp -a ./usr/lib/x86_64-linux-gnu/*.so* ./usr/lib
-rm -rf ./usr/lib/x86_64-linux-gnu
-
-cp -a ./usr/lib64/*.so* ./usr/lib
-rm -rf ./usr/lib64
-
-cp -a "./$PREFIX/lib/x86_64-linux-gnu/"*.so* ./usr/lib
-rm -rf "./$PREFIX/lib/x86_64-linux-gnu"
-
-cp -a "./$PREFIX/lib/"*.so* ./usr/lib
-rm -rf "./$PREFIX/lib"
-
-cp -a "./$PREFIX/lib64/"*.so* ./usr/lib
-rm -rf "./$PREFIX/lib64"
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Compile Glib schemas"
-echo ""
-
-# Compile Glib schemas
-glib_prefix="$(pkg-config --variable=prefix glib-2.0)"
-(mkdir -p usr/share/glib-2.0/schemas/ && \
-cp -a ${glib_prefix}/share/glib-2.0/schemas/* usr/share/glib-2.0/schemas && \
-cd usr/share/glib-2.0/schemas/ && \
-glib-compile-schemas .) || exit 1
-
-# Copy gconv
-cp -a /usr/lib64/gconv usr/lib
-
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy gdk-pixbuf modules and cache file"
-echo ""
-
-# Copy gdk-pixbuf modules and cache file, and patch the cache file
-# so that modules are picked from the AppImage bundle
-gdk_pixbuf_moduledir="$(pkg-config --variable=gdk_pixbuf_moduledir gdk-pixbuf-2.0)"
-gdk_pixbuf_cache_file="$(pkg-config --variable=gdk_pixbuf_cache_file gdk-pixbuf-2.0)"
-gdk_pixbuf_libdir_bundle="lib/gdk-pixbuf-2.0"
-gdk_pixbuf_cache_file_bundle="usr/${gdk_pixbuf_libdir_bundle}/loaders.cache"
-
-mkdir -p "usr/${gdk_pixbuf_libdir_bundle}"
-cp -a "$gdk_pixbuf_moduledir" "usr/${gdk_pixbuf_libdir_bundle}"
-cp -a "$gdk_pixbuf_cache_file" "usr/${gdk_pixbuf_libdir_bundle}"
-sed -i -e "s|${gdk_pixbuf_moduledir}|LOADERSDIR|g" "$gdk_pixbuf_cache_file_bundle"
-
-
-# TODO Check this, was:
-#for m in $(ls "usr/${gdk_pixbuf_libdir_bundle}"/loaders/*.so); do
-#for m in "usr/${gdk_pixbuf_libdir_bundle}/loaders/"*.so; do
-#    sofile="$(basename "$m")"
-#    sed -i -e "s|${gdk_pixbuf_moduledir}/${sofile}|./${gdk_pixbuf_libdir_bundle}/loaders/${sofile}|g" "$gdk_pixbuf_cache_file_bundle"
-#done
-
-printf '%s\n' "" "==================" "gdk-pixbuf cache:"
-cat "$gdk_pixbuf_cache_file_bundle"
-printf '%s\n' "==================" "gdk-pixbuf loaders:"
-ls "usr/${gdk_pixbuf_libdir_bundle}/loaders"
-printf '%s\n' "=================="
-
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy the pixmap theme engine"
-echo ""
-
-# Copy the pixmap theme engine
-mkdir -p usr/lib/gtk-2.0/engines
-gtk_libdir="$(pkg-config --variable=libdir gtk+-2.0)"
-pixmap_lib="$(find \"${gtk_libdir}/gtk-2.0\" -name libpixmap.so)"
-if [[ x"${pixmap_lib}" != "x" ]]; then
-    cp -L "${pixmap_lib}" usr/lib/gtk-2.0/engines
-fi
-
-
+if [ "x" = "y" ]; then
 echo ""
 echo "########################################################################"
 echo ""
@@ -440,8 +356,9 @@ echo "Copy MIME files"
 echo ""
 
 # Copy MIME files
-mkdir -p usr/share
-cp -a /usr/share/mime usr/share || exit 1
+mkdir -p usr/share/image
+cp -a /usr/share/mime/image/x-*.xml usr/share/image || exit 1
+fi
 
 
 
@@ -453,19 +370,6 @@ echo ""
 
 # Move all libraries into $APPDIR/usr/lib
 move_lib
-
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Fix path of pango modules"
-echo ""
-
-# Fix path of pango modules
-patch_pango
-
-# Delete stuff that should not go into the AppImage
-rm -rf usr/include usr/libexec usr/_jhbuild usr/share/doc
 
 
 echo ""
@@ -501,41 +405,7 @@ echo ""
 echo "Copy libstdc++.so.6 and libgomp.so.1 into the AppImage"
 echo ""
 
-# Copy libstdc++.so.6 and libgomp.so.1 into the AppImage
-# They will be used if they are newer than those of the host
-# system in which the AppImage will be executed
-
-stdcxxlib="$(ldconfig -p | grep 'libstdc++.so.6 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
-echo "stdcxxlib: $stdcxxlib"
-if [[ x"$stdcxxlib" != "x" ]]; then
-    mkdir -p usr/optional/libstdc++
-    cp -L "$stdcxxlib" usr/optional/libstdc++ || exit 1
-fi
-
-gomplib="$(ldconfig -p | grep 'libgomp.so.1 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
-echo "gomplib: $gomplib"
-if [[ x"$gomplib" != "x" ]]; then
-    mkdir -p usr/optional/libstdc++
-    cp -L "$gomplib" usr/optional/libstdc++ || exit 1
-fi
-
-atomiclib="$(ldconfig -p | grep 'libatomic.so.1 (libc6,x86-64)'| awk 'NR==1{print $NF}')"
-echo "atomiclib: $atomiclib"
-if [[ x"$atomiclib" != "x" ]]; then
-    mkdir -p usr/optional/libstdc++
-    cp -L "$atomiclib" usr/optional/libstdc++ || exit 1
-fi
-
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Patch away absolute paths"
-echo ""
-
-# Patch away absolute paths; it would be nice if they were relative
-#find usr/ -type f -exec sed -i -e 's|/usr/|././/|g' {} \; -exec echo -n "Patched /usr in " \; -exec echo {} \; >& patch1.log
-#find usr/ -type f -exec sed -i -e "s|/${PREFIX}/|././/|g" {} \; -exec echo -n "Patched /${PREFIX} in " \; -exec echo {} \; >& patch2.log
+copy_gcc_libs
 
 
 echo ""
@@ -566,27 +436,13 @@ echo ""
 cp -a "${AI_SCRIPTS_DIR}/AppRun" . || exit 1
 #cp -a "${AI_SCRIPTS_DIR}/fixes.sh" . || exit 1
 cp -a /work/appimage-helper-scripts/apprun-helper.sh "./apprun-helper.sh" || exit 1
+cp -a "${AI_SCRIPTS_DIR}/check_updates.sh" . || exit 1
+cp -a "${AI_SCRIPTS_DIR}/zenity.sh" usr/bin || exit 1
 #wget -q https://raw.githubusercontent.com/aferrero2707/appimage-helper-scripts/master/apprun-helper.sh -O "./apprun-helper.sh" || exit 1
 get_desktop || exit 1
 get_icon || exit 1
 
 #exit
-
-
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy fonts configuration"
-echo ""
-
-# The fonts configuration should not be patched, copy back original one
-if [[ -e /$PREFIX/etc/fonts/fonts.conf ]]; then
-    mkdir -p usr/etc/fonts
-    cp "/$PREFIX/etc/fonts/fonts.conf" usr/etc/fonts/fonts.conf || exit 1
-elif [[ -e /usr/etc/fonts/fonts.conf ]]; then
-    mkdir -p usr/etc/fonts
-    cp /usr/etc/fonts/fonts.conf usr/etc/fonts/fonts.conf || exit 1
-fi
 
 
 echo ""
@@ -610,6 +466,10 @@ echo ""
 
 # desktopintegration asks the user on first run to install a menu item
 get_desktopintegration "$LOWERAPP"
+cp -a "/sources/ci/$LOWERAPP.wrapper" "$APPDIR/usr/bin/$LOWERAPP.wrapper"
+
+#DESKTOP_NAME=$(cat "$APPDIR/$LOWERAPP.desktop" | grep "^Name=.*")
+#sed -i -e "s|${DESKTOP_NAME}|${DESKTOP_NAME} (AppImage)|g" "$APPDIR/$LOWERAPP.desktop"
 
 
 echo ""
@@ -671,6 +531,10 @@ export VERSION="${ver}"
 export VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
 echo "VERSION:  $VERSION"
 echo "VERSION2: $VERSION2"
+
+echo "${APP}-${RT_BRANCH}" > "$APPDIR/VERSION.txt"
+echo "${GIT_DESCRIBE}" >> "$APPDIR/VERSION.txt"
+echo "${APP}-${VERSION}-${ARCH}.AppImage" >> "$APPDIR/VERSION.txt"
 
 wd="$(pwd)"
 mkdir -p ../out/
