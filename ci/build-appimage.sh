@@ -20,9 +20,9 @@ export LC_ALL="en_US.UTF-8"
 (yum update -y && yum install -y epel-release) || exit 1
 yum install -y https://centos7.iuscommunity.org/ius-release.rpm #|| exit 1
 yum install -y centos-release-scl || exit 1
-yum install -y devtoolset-4-gcc devtoolset-4-gcc-c++ || exit 1
+yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ || exit 1
 (yum update -y && yum install -y libtool-ltdl-devel autoconf automake libtools which json-c-devel json-glib-devel gtk-doc gperf libuuid-devel libcroco-devel intltool libpng-devel cmake3 make git \
-bzip2 automake fftw-devel libjpeg-turbo-devel \
+file bzip2 automake fftw-devel libjpeg-turbo-devel \
 libwebp-devel libxml2-devel swig ImageMagick-c++-devel \
 bc cfitsio-devel gsl-devel matio-devel \
 giflib-devel pugixml-devel wget curl git itstool \
@@ -35,7 +35,7 @@ pixman-devel libffi-devel gtkmm24-devel gtkmm30-devel libcanberra-devel \
 lcms2-devel gtk-doc nano OpenEXR-devel libcroco-devel python36u python36u-libs python36u-devel python36u-pip gnome-common) || exit 1
 
 
-source scl_source enable devtoolset-4
+source scl_source enable devtoolset-7
 
 cd /usr/bin
 ln -f -s python3.6 python3
