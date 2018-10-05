@@ -232,12 +232,13 @@ echo "VERSION2: $VERSION2"
 
 echo "${APP}-${RT_BRANCH}" > "$APPDIR/VERSION.txt"
 echo "${GIT_DESCRIBE}" >> "$APPDIR/VERSION.txt"
-echo "${APP}-${VERSION}-${ARCH}.AppImage" >> "$APPDIR/VERSION.txt"
+echo "${APP}-${VERSION2}.AppImage" >> "$APPDIR/VERSION.txt"
 
 wd="$(pwd)"
 mkdir -p ../out/
 export NO_GLIBC_VERSION=true
 export DOCKER_BUILD=true
+#export SIGN="1"
 AI_OUT="../out/${APP}-${VERSION}-${ARCH}.AppImage"
 generate_type2_appimage
 
@@ -273,3 +274,5 @@ ls ../out/*
 #echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
 mkdir -p /sources/out
 cp ../out/${APP}-${VERSION2}.AppImage /sources/out
+cd /sources/out || exit 1
+sha256sum ${APP}-${VERSION2}.AppImage ${APP}-${VERSION2}.AppImage.sha256sum
