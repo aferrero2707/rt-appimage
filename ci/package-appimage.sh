@@ -275,4 +275,4 @@ ls ../out/*
 mkdir -p /sources/out
 cp ../out/${APP}-${VERSION2}.AppImage /sources/out
 cd /sources/out || exit 1
-sha256sum ${APP}-${VERSION2}.AppImage ${APP}-${VERSION2}.AppImage.sha256sum
+sha256sum ${APP}-${VERSION2}.AppImage > ${APP}-${VERSION2}.AppImage.sha256sum

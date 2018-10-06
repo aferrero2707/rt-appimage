@@ -20,7 +20,7 @@ export LC_ALL="en_US.UTF-8"
 (yum update -y && yum install -y epel-release) || exit 1
 yum install -y https://centos7.iuscommunity.org/ius-release.rpm #|| exit 1
 yum install -y centos-release-scl || exit 1
-yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ || exit 1
+yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-libatomic-devel || exit 1
 (yum update -y && yum install -y libtool-ltdl-devel autoconf automake libtools which json-c-devel json-glib-devel gtk-doc gperf libuuid-devel libcroco-devel intltool libpng-devel cmake3 make git \
 file bzip2 automake fftw-devel libjpeg-turbo-devel \
 libwebp-devel libxml2-devel swig ImageMagick-c++-devel \
