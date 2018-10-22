@@ -1,8 +1,9 @@
 #! /bin/bash
 
-	AINAME="$1"
-	REPO_SLUG="$2"
-	RELEASE_TAG="$3"
+	APP="$1"
+	AINAME="$2"
+	REPO_SLUG="$3"
+	RELEASE_TAG="$4"
 	
 	rm -f assets.txt
 	

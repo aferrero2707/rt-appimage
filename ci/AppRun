@@ -43,7 +43,7 @@ if [ -e "$HOME/.local/appimages/$APP-enable-update" ]; then
 	#APP=luminance-hdr #$3
 	RELEASE_TAG="nightly" #"$2"
 
-	echo "$APPDIR/check_updates.sh $AINAME $REPO_SLUG $RELEASE_TAG"
+	echo "$APPDIR/check_updates.sh $APP $AINAME $REPO_SLUG $RELEASE_TAG"
 	LATEST=$("$APPDIR/check_updates.sh" "$AINAME" "$REPO_SLUG" "$RELEASE_TAG")
 	if [ x"$LATEST" != "x" ]; then
 		ID=$(echo "$LATEST" | cut -d'%' -f 1 | cut -d'@' -f 2)
