@@ -12,6 +12,7 @@ AINAME=$(cat "$APPDIR/VERSION.txt" | head -n 3 | tail -n 1)
 
 DO_UPDATE=1
 if [ x"$1" = "x--enable-auto-update" ]; then
+	mkdir -p "$HOME/.local/appimages/"
 	touch "$HOME/.local/appimages/$APP-enable-update"
 	exit
 fi
