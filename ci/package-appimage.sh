@@ -226,12 +226,12 @@ else
 fi
 export ARCH="x86_64"
 export VERSION="${ver}"
-export VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}"
+export VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}-$(date '+%Y%m%d')"
 echo "VERSION:  $VERSION"
 echo "VERSION2: $VERSION2"
 
 echo "${APP}-${RT_BRANCH}" > "$APPDIR/VERSION.txt"
-echo "${GIT_DESCRIBE}" >> "$APPDIR/VERSION.txt"
+echo "${GIT_DESCRIBE}-$(date '+%Y%m%d')" >> "$APPDIR/VERSION.txt"
 echo "${APP}-${VERSION2}.AppImage" >> "$APPDIR/VERSION.txt"
 
 wd="$(pwd)"
