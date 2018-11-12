@@ -18,6 +18,11 @@ echo ""
 source /work/appimage-helper-scripts/functions.sh
 
 
+#locale-gen en_US.UTF-8
+export LANG="en_US.UTF-8"
+export LANGUAGE="en_US:en"
+export LC_ALL="en_US.UTF-8"
+
 
 
 echo ""
@@ -178,6 +183,11 @@ echo ""
 
 # Update the Lensfun database and put the newest version into the bundle
 #export PYTHONPATH=/$PREFIX/lib/python3.6/site-packages:$PYTHONPATH
+LFDIR=$(find /usr/local/lib/python*/site-packages/ -name lensfun)
+if [ -n "$LFDIR" ]; then
+	export PYTHONPATH="$(dirname "$LFDIR")":$PYTHONPATH
+	echo "PYTHONPATH: $PYTHONPATH"
+fi
 "/usr/local/bin/lensfun-update-data"
 mkdir -p usr/share/lensfun/version_1
 if [ -e /var/lib/lensfun-updates/version_1 ]; then
