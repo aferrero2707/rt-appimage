@@ -9,7 +9,7 @@ env:
   - RT_BRANCH=newlocallab
   - RT_BRANCH=waveletnew
   - RT_BRANCH=releases
-  #- RT_BRANCH=release-5.5
+  - RT_BRANCH=5.6-rc1
 
 before_script:
   - git clone https://github.com/Beep6581/RawTherapee.git --branch $RT_BRANCH --single-branch
