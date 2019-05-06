@@ -8,6 +8,7 @@ env:
   - RT_BRANCH=dev
   - RT_BRANCH=newlocallab
   - RT_BRANCH=waveletnew
+  - RT_BRANCH=waveletnh
   - RT_BRANCH=releases
 
 before_script:
