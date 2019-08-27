@@ -9,6 +9,7 @@ env:
   - RT_BRANCH=newlocallab
   - RT_BRANCH=waveletnew
   - RT_BRANCH=wavelenh
+  - RT_BRANCH=capture_sharpening
   - RT_BRANCH=releases
 
 before_script:
