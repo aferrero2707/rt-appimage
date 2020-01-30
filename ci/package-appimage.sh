@@ -59,11 +59,11 @@ copy_deps2; copy_deps2; copy_deps2;
 
 
 if [ "x" = "x" ]; then
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy MIME files"
-echo ""
+    echo ""
+    echo "########################################################################"
+    echo ""
+    echo "Copy MIME files"
+    echo ""
 
 # Copy MIME files
 mkdir -p usr/share/image
@@ -185,15 +185,15 @@ echo ""
 #export PYTHONPATH=/$PREFIX/lib/python3.6/site-packages:$PYTHONPATH
 LFDIR=$(find /usr/local/lib/python*/site-packages/ -name lensfun)
 if [ -n "$LFDIR" ]; then
-	export PYTHONPATH="$(dirname "$LFDIR")":$PYTHONPATH
-	echo "PYTHONPATH: $PYTHONPATH"
+    export PYTHONPATH="$(dirname "$LFDIR")":$PYTHONPATH
+    echo "PYTHONPATH: $PYTHONPATH"
 fi
 "/usr/local/bin/lensfun-update-data"
 mkdir -p usr/share/lensfun/version_1
 if [ -e /var/lib/lensfun-updates/version_1 ]; then
-	cp -a /var/lib/lensfun-updates/version_1/* usr/share/lensfun/version_1
+    cp -a /var/lib/lensfun-updates/version_1/* usr/share/lensfun/version_1
 else
-	cp -a "/usr/local/share/lensfun/version_1/"* usr/share/lensfun/version_1
+    cp -a "/usr/local/share/lensfun/version_1/"* usr/share/lensfun/version_1
 fi
 printf '%s\n' "" "==================" "Contents of lensfun database:"
 ls usr/share/lensfun/version_1
@@ -255,18 +255,18 @@ AI_OUT="../out/${APP}-${VERSION}-${ARCH}.AppImage"
 generate_type2_appimage
 
 if [ "x" = "y" ]; then
-#generate_appimage
-# Download AppImageAssistant
-URL="https://github.com/AppImage/AppImageKit/releases/download/6/AppImageAssistant_6-x86_64.AppImage"
-rm -f AppImageAssistant
-wget -c "$URL" -O AppImageAssistant
-chmod a+x ./AppImageAssistant
-(rm -rf /tmp/squashfs-root && mkdir /tmp/squashfs-root && cd /tmp/squashfs-root && bsdtar xfp $wd/AppImageAssistant) || exit 1
-#./AppImageAssistant --appimage-extract
-mkdir -p ../out || true
-GLIBC_NEEDED=$(glibc_needed)
-rm "${AI_OUT}" 2>/dev/null || true
-/tmp/squashfs-root/AppRun ./$APP.AppDir/ "${AI_OUT}"
+    #generate_appimage
+    # Download AppImageAssistant
+    URL="https://github.com/AppImage/AppImageKit/releases/download/6/AppImageAssistant_6-x86_64.AppImage"
+    rm -f AppImageAssistant
+    wget -c "$URL" -O AppImageAssistant
+    chmod a+x ./AppImageAssistant
+    (rm -rf /tmp/squashfs-root && mkdir /tmp/squashfs-root && cd /tmp/squashfs-root && bsdtar xfp $wd/AppImageAssistant) || exit 1
+    #./AppImageAssistant --appimage-extract
+    mkdir -p ../out || true
+    GLIBC_NEEDED=$(glibc_needed)
+    rm "${AI_OUT}" 2>/dev/null || true
+    /tmp/squashfs-root/AppRun ./$APP.AppDir/ "${AI_OUT}"
 fi
 
 ls ../out/*
