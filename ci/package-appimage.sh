@@ -228,11 +228,13 @@ echo "GIT_DESCRIBE: ${GIT_DESCRIBE}"
 cd "$APPROOT"
 glibcVer="$(glibc_needed)"
 #ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
-if [ "x${RT_BRANCH}" = "xreleases" ]; then
-	rtver=$(cat AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
-	ver="${rtver}-$(date '+%Y%m%d_%H%M')"
+if [[ $RT_BRANCH = releases ]]; then
+    # Expects: "Version: 5.7-433-gc0e2ee1b9"
+    # Sets: "5.7-433-gc0e2ee1b9"
+    rtver="$(grep Version AboutThisBuild.txt | sed 's/Version: //')"
+    ver="${rtver}-$(date '+%Y%m%d_%H%M')"
 else
-	ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
+    ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
 fi
 export ARCH="x86_64"
 export VERSION="${ver}"
