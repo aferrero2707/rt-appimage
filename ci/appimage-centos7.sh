@@ -16,6 +16,8 @@ die () {
 
 trap die HUP INT QUIT ABRT TERM
 
+printf '%s\n' "SELFIDENT begin: appimage-centos7.sh"
+
 # Enable debugging output until this is ready for merging
 #set -x
 
@@ -575,3 +577,5 @@ ls ../out/*
 #echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
 mkdir -p /sources/out
 cp ../out/${APP}-${VERSION2}.AppImage /sources/out
+
+printf '%s\n' "SELFIDENT end: appimage-centos7.sh"

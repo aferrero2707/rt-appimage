@@ -16,6 +16,8 @@ die () {
 
 trap die HUP INT QUIT ABRT TERM
 
+printf '%s\n' "SELFIDENT begin: appimage-centos6.sh"
+
 # Enable debugging output until this is ready for merging
 #set -x
 
@@ -568,4 +570,7 @@ transfer "${APP}.tgz"
 printf '%s\n' "" "The .tgz has been uploaded to the URL above." ""
 # AppDir complete
 # Packaging it as an AppImage cannot be done within a Docker container
+
+printf '%s\n' "SELFIDENT end: appimage-centos6.sh"
+
 exit 0

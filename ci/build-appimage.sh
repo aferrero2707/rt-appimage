@@ -3,6 +3,7 @@
 # Prefix (without the leading "/") in which RawTherapee and its dependencies are installed:
 export PREFIX="$AIPREFIX"
 
+printf '%s\n' "SELFIDENT begin: build-appimage.sh"
 
 # Set environment variables to allow finding the dependencies that are
 # compiled from sources
@@ -193,3 +194,4 @@ make install || exit 1
 
 touch /work/build.done
 
+printf '%s\n' "SELFIDENT end: build-appimage.sh"
