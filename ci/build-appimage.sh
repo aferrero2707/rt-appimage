@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-printf '%s\n' "SELFIDENT begin: build-appimage.sh"
-
 msg () {
     printf '%s\n' \
         "" "" "" "" \
@@ -217,5 +215,3 @@ make install || exit 1
 
 
 touch /work/build.done
-
-printf '%s\n' "SELFIDENT end: build-appimage.sh"

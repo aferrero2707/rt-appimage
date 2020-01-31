@@ -1,7 +1,5 @@
 #!/usr/bin/env bash
 
-printf '%s\n' "SELFIDENT begin: mkappimage.sh"
-
 export APP=RawTherapee
 
 (yum update -y && yum install -y git) || exit 1
@@ -24,5 +22,3 @@ fi
     cp -a "/work/appimage-helper-scripts/bundle-gtk2.sh" "${APPROOT}/scripts") || exit 1
 
 bash /sources/ci/package-appimage.sh || exit 1
-
-printf '%s\n' "SELFIDENT end: mkappimage.sh"

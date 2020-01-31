@@ -2,7 +2,7 @@
 
 ########################################################################
 # Package the binaries built on Travis-CI as an AppImage
-# By Simon Peter 2016
+# Originally by Simon Peter 2016
 # For more information, see http://appimage.org/
 # Report issues to https://github.com/Beep6581/RawTherapee/issues
 ########################################################################
@@ -15,11 +15,6 @@ die () {
 }
 
 trap die HUP INT QUIT ABRT TERM
-
-printf '%s\n' "SELFIDENT begin: appimage-centos7.sh"
-
-# Enable debugging output until this is ready for merging
-#set -x
 
 # Program name
 APP="RawTherapee"
@@ -114,11 +109,10 @@ yum -y install  git2u-all
 cd /usr/bin
 ln -f -s python3.6 python3
 ln -f -s python3.6-config python3-config
-#exit 0
 
 DO_BUILD=0
 if [ ! -e /work/build.done ]; then
-	DO_BUILD=1
+    DO_BUILD=1
 fi
 
 if [ x"$DO_BUILD" = "x1" ]; then
@@ -526,10 +520,10 @@ cd "$APPIMAGEBASE"
 glibcVer="$(glibc_needed)"
 #ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
 if [ "x${RT_BRANCH}" = "xreleases" ]; then
-	rtver=$(cat AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
-	ver="${rtver}-$(date '+%Y%m%d_%H%M')"
+    rtver=$(cat AboutThisBuild.txt | grep "Version:" | head -n 1 | cut -d" " -f 2)
+    ver="${rtver}-$(date '+%Y%m%d_%H%M')"
 else
-	ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
+    ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
 fi
 export ARCH="x86_64"
 export VERSION="${ver}"
@@ -580,5 +574,3 @@ ls ../out/*
 #echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
 mkdir -p /sources/out
 cp ../out/${APP}-${VERSION2}.AppImage /sources/out
-
-printf '%s\n' "SELFIDENT end: appimage-centos7.sh"

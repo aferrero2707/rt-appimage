@@ -1,8 +1,5 @@
 #! /bin/bash
 
-set -x
-printf '%s\n' "SELFIDENT begin: package-appimage.sh"
-
 msg () {
     printf '%s\n' \
         "" "" "" "" \
@@ -45,8 +42,6 @@ mkdir -p "${APPDIR}/usr/"
 echo "  APPROOT: \"$APPROOT\""
 echo "  APPDIR: \"$APPDIR\""
 echo ""
-
-#sudo chown -R "$USER" "/${PREFIX}/"
 
 run_hooks
 
@@ -185,7 +180,6 @@ msg "RT_BRANCH: ${RT_BRANCH}" "GIT_DESCRIBE: ${GIT_DESCRIBE}"
 
 
 msg "Prepare to generate AppImage"
-pwd
 # Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
 cd "$APPROOT"
 # See "Rename AppImage" section for info on desired final filename format
@@ -235,5 +229,3 @@ mkdir -p /sources/out
 cp -v "../out/RawTherapee_${VERSION}.AppImage" /sources/out/
 cd /sources/out
 sha256sum "RawTherapee_${VERSION}.AppImage" > "RawTherapee_${VERSION}.AppImage.sha256sum"
-
-printf '%s\n' "SELFIDENT end: package-appimage.sh"
