@@ -226,54 +226,40 @@ echo "GIT_DESCRIBE: ${GIT_DESCRIBE}"
 
 # Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
 cd "$APPROOT"
-glibcVer="$(glibc_needed)"
-#ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')-glibc${glibcVer}"
+
+# Desired version format,
+#   tagged releases:
+#       RawTherapee_tag.AppImage (gitdescribe in this case will print the tag)
+#   development builds:
+#       RawTherapee_branch_gitdescribe_date.AppImage
 if [[ $RT_BRANCH = releases ]]; then
-    # Expects: "Version: 5.7-433-gc0e2ee1b9"
-    # Sets: "5.7-433-gc0e2ee1b9"
-    rtver="$(grep Version AboutThisBuild.txt | sed 's/Version: //')"
-    ver="${rtver}-$(date '+%Y%m%d_%H%M')"
+    ver="$(git describe --tags --always)"
 else
-    ver="git-${RT_BRANCH}-$(date '+%Y%m%d_%H%M')"
+    ver="${RT_BRANCH}_$(git describe --tags --always)_$(date '+%Y%m%d')"
 fi
 export ARCH="x86_64"
-export VERSION="${ver}"
-export VERSION2="${RT_BRANCH}-${GIT_DESCRIBE}-$(date '+%Y%m%d')"
-echo "VERSION:  $VERSION"
-echo "VERSION2: $VERSION2"
+export VERSION="$ver"
+echo "VERSION: $VERSION"
 
-echo "${APP}-${RT_BRANCH}" > "$APPDIR/VERSION.txt"
-echo "${GIT_DESCRIBE}-$(date '+%Y%m%d')" >> "$APPDIR/VERSION.txt"
-echo "${APP}-${VERSION2}.AppImage" >> "$APPDIR/VERSION.txt"
+cat <<EOF > "$APPDIR/VERSION.txt"
+$APP
+$VERSION
+${APP}_${VERSION}.AppImage
+EOF
 
-wd="$(pwd)"
-mkdir -p ../out/
 export NO_GLIBC_VERSION=true
 export DOCKER_BUILD=true
-#export SIGN="1"
-AI_OUT="../out/${APP}-${VERSION}-${ARCH}.AppImage"
+
+set -x
+pwd
+mkdir -p ../out/
+ls -lah ../out/
+# TODO: What filename will the generated AppImage have?
 generate_type2_appimage
-
-if [ "x" = "y" ]; then
-    #generate_appimage
-    # Download AppImageAssistant
-    URL="https://github.com/AppImage/AppImageKit/releases/download/6/AppImageAssistant_6-x86_64.AppImage"
-    rm -f AppImageAssistant
-    wget -c "$URL" -O AppImageAssistant
-    chmod a+x ./AppImageAssistant
-    (rm -rf /tmp/squashfs-root && mkdir /tmp/squashfs-root && cd /tmp/squashfs-root && bsdtar xfp $wd/AppImageAssistant) || exit 1
-    #./AppImageAssistant --appimage-extract
-    mkdir -p ../out || true
-    GLIBC_NEEDED=$(glibc_needed)
-    rm "${AI_OUT}" 2>/dev/null || true
-    /tmp/squashfs-root/AppRun ./$APP.AppDir/ "${AI_OUT}"
-fi
-
-ls ../out/*
-
-rm -f ../out/${APP}-${VERSION2}.AppImage
-mv "${AI_OUT}" ../out/${APP}-${VERSION2}.AppImage
-
+ai_filename="${APP}_${VERSION}.AppImage"
+AI_OUT="../out/${ai_filename}"
+ls -lah ../out/
+#mv -v ../out/${APP}_${VERSION}.AppImage ../out/${APP}_${VERSION}.AppImage
 
 ########################################################################
 # Upload the AppDir
@@ -281,10 +267,7 @@ mv "${AI_OUT}" ../out/${APP}-${VERSION2}.AppImage
 
 pwd
 ls ../out/*
-#transfer ../out/*
-#echo ""
-#echo "AppImage has been uploaded to the URL above; use something like GitHub Releases for permanent storage"
 mkdir -p /sources/out
-cp ../out/${APP}-${VERSION2}.AppImage /sources/out
+cp ../out/"$ai_filename" /sources/out
 cd /sources/out || exit 1
-sha256sum ${APP}-${VERSION2}.AppImage > ${APP}-${VERSION2}.AppImage.sha256sum
+sha256sum "$ai_filename" > "${ai_filename}.sha256sum"
