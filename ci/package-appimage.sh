@@ -1,5 +1,7 @@
 #! /bin/bash
 
+printf '%s\n' "SELFIDENT begin: package-appimage.sh"
+
 # Prefix (without the leading "/") in which RawTherapee and its dependencies are installed:
 set -x
 LOWERAPP=${APP,,}
@@ -272,3 +274,5 @@ mkdir -p /sources/out
 cp ../out/"$ai_filename" /sources/out
 cd /sources/out || exit 1
 sha256sum "$ai_filename" > "${ai_filename}.sha256sum"
+
+printf '%s\n' "SELFIDENT end: package-appimage.sh"
