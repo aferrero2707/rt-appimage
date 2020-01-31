@@ -1,9 +1,9 @@
 #! /bin/bash
 
+set -x
 printf '%s\n' "SELFIDENT begin: package-appimage.sh"
 
 # Prefix (without the leading "/") in which RawTherapee and its dependencies are installed:
-set -x
 LOWERAPP=${APP,,}
 export PATH="/usr/local/bin:${PATH}"
 export LD_LIBRARY_PATH="/usr/local/lib64:/usr/local/lib:${LD_LIBRARY_PATH}"
@@ -235,7 +235,6 @@ cd "$APPROOT"
 #       RawTherapee_tag.AppImage (gitdescribe in this case will print the tag)
 #   development builds:
 #       RawTherapee_branch_gitdescribe_date.AppImage
-set -x
 if [[ $RT_BRANCH = releases ]]; then
     ver="$(git describe --tags --always)"
 else
