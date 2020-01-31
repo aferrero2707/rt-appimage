@@ -228,7 +228,7 @@ msg "Rename AppImage and move to /sources/out" \
     "Desired filename format for a development build:" \
     "    RawTherapee_branch_gitdescribe_date.AppImage"
 # Generated filename: APP-BRANCH_GITDESCRIBE_DATE-ARCH.AppImage
-ai_filename="${APP}-${RTBRANCH}_${GIT_DESCRIBE}_${curr_date}-${ARCH}.AppImage"
+ai_filename="${APP}-${RT_BRANCH}_${GIT_DESCRIBE}_${curr_date}-${ARCH}.AppImage"
 mv -v ../out/"$ai_filename" "../out/RawTherapee_${VERSION}.AppImage"
 
 mkdir -p /sources/out
