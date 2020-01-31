@@ -184,19 +184,16 @@ msg "RT_BRANCH: ${RT_BRANCH}" "GIT_DESCRIBE: ${GIT_DESCRIBE}"
 
 
 
-msg "Generate AppImage"
+msg "Prepare to generate AppImage"
+pwd
 # Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
 cd "$APPROOT"
-
-# Desired version format,
-#   tagged releases:
-#       RawTherapee_tag.AppImage (gitdescribe in this case will print the tag)
-#   development builds:
-#       RawTherapee_branch_gitdescribe_date.AppImage
+# See "Rename AppImage" section for info on desired final filename format
+curr_date="$(date '+%Y%m%d')"
 if [[ $RT_BRANCH = releases ]]; then
-    ver="$(git describe --tags --always)"
+    ver="${GIT_DESCRIBE}"
 else
-    ver="${RT_BRANCH}_$(git describe --tags --always)_$(date '+%Y%m%d')"
+    ver="${RT_BRANCH}_${GIT_DESCRIBE}_${curr_date}"
 fi
 export ARCH="x86_64"
 export VERSION="$ver"
@@ -213,23 +210,30 @@ export DOCKER_BUILD=true
 
 pwd
 mkdir -p ../out/
-ls -lah ../out/
-# TODO: What filename will the generated AppImage have?
+
+
+
+
+msg "Generate AppImage"
 generate_type2_appimage
-ai_filename="${APP}_${VERSION}.AppImage"
-AI_OUT="../out/${ai_filename}"
 ls -lah ../out/
-#mv -v ../out/${APP}_${VERSION}.AppImage ../out/${APP}_${VERSION}.AppImage
 
 
 
 
-msg "Copy AppImage to /sources/out"
-pwd
-ls ../out/*
+
+msg "Rename AppImage and move to /sources/out" \
+    "Desired filename format for a tagged release:" \
+    "    RawTherapee_tag.AppImage (gitdescribe in this case will print the tag)" \
+    "Desired filename format for a development build:" \
+    "    RawTherapee_branch_gitdescribe_date.AppImage"
+# Generated filename: APP-BRANCH_GITDESCRIBE_DATE-ARCH.AppImage
+ai_filename="${APP}-${RTBRANCH}_${GIT_DESCRIBE}_${curr_date}-${ARCH}.AppImage"
+mv -v ../out/"$ai_filename" "../out/RawTherapee_${VERSION}.AppImage"
+
 mkdir -p /sources/out
-cp ../out/"$ai_filename" /sources/out
-cd /sources/out || exit 1
-sha256sum "$ai_filename" > "${ai_filename}.sha256sum"
+cp -v "../out/RawTherapee_${VERSION}.AppImage" /sources/out/
+cd /sources/out
+sha256sum "RawTherapee_${VERSION}.AppImage" > "RawTherapee_${VERSION}.AppImage.sha256sum"
 
 printf '%s\n' "SELFIDENT end: package-appimage.sh"
