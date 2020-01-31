@@ -106,7 +106,9 @@ export LC_ALL="en_US.UTF-8"
 # Add some required packages
 yum install -y https://centos7.iuscommunity.org/ius-release.rpm #|| exit 1
 yum update -y #|| exit 1
-yum install -y wget curl git lcms2-devel gtk-doc libcroco-devel which python36u python36u-libs python36u-devel python36u-pip gnome-common || exit 1
+yum install -y wget curl lcms2-devel gtk-doc libcroco-devel which python36u python36u-libs python36u-devel python36u-pip gnome-common || exit 1
+sudo yum -y install  https://centos7.iuscommunity.org/ius-release.rpm
+sudo yum -y install  git2u-all
 
 cd /usr/bin
 ln -f -s python3.6 python3
