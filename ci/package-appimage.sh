@@ -3,23 +3,27 @@
 set -x
 printf '%s\n' "SELFIDENT begin: package-appimage.sh"
 
+msg () {
+    printf '%s\n' \
+        "" "" "" "" \
+        "----------------------------------------" \
+        "$@" \
+        "----------------------------------------" \
+        ""
+}
+
 # Prefix (without the leading "/") in which RawTherapee and its dependencies are installed:
 LOWERAPP=${APP,,}
 export PATH="/usr/local/bin:${PATH}"
 export LD_LIBRARY_PATH="/usr/local/lib64:/usr/local/lib:${LD_LIBRARY_PATH}"
 export PKG_CONFIG_PATH="/usr/local/lib64/pkgconfig:/usr/local/lib/pkgconfig:${PKG_CONFIG_PATH}"
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "AppImage configuration:"
-echo "  APP: \"$APP\""
-echo "  LOWERAPP: \"$LOWERAPP\""
-echo "  AI_SCRIPTS_DIR: \"${AI_SCRIPTS_DIR}\""
-echo ""
+msg "AppImage configuration:" \
+    "    APP: \"$APP\"" \
+    "    LOWERAPP: \"$LOWERAPP\"" \
+    "    AI_SCRIPTS_DIR: \"$AI_SCRIPTS_DIR\""
 
 source /work/appimage-helper-scripts/functions.sh
-
 
 #locale-gen en_US.UTF-8
 export LANG="en_US.UTF-8"
@@ -28,10 +32,8 @@ export LC_ALL="en_US.UTF-8"
 
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Creating and cleaning AppImage folder"
+
+msg "Creating and cleaning AppImage folder"
 
 #cp "${AI_SCRIPTS_DIR}"/excludelist . || exit 1
 cp /work/appimage-helper-scripts/excludelist "$APPROOT/excludelist"
@@ -51,9 +53,7 @@ run_hooks
 cp -a /usr/local/bin/zenity "$APPDIR/usr/bin" || exit 1
 cp -a /usr/local/share/zenity "$APPDIR/usr/share" || exit 1
 
-
 cd "$APPDIR" || exit 1
-
 
 # Copy in the dependencies that cannot be assumed to be available
 # on all target systems
@@ -61,84 +61,52 @@ copy_deps2; copy_deps2; copy_deps2;
 
 
 
-if [ "x" = "x" ]; then
-    echo ""
-    echo "########################################################################"
-    echo ""
-    echo "Copy MIME files"
-    echo ""
 
-# Copy MIME files
+msg "Copy MIME files"
 mkdir -p usr/share/image
 cp -a /usr/share/mime/image/x-*.xml usr/share/image || exit 1
-fi
 
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo 'Move all libraries into $APPDIR/usr/lib'
-echo ""
 
-# Move all libraries into $APPDIR/usr/lib
+msg 'Move all libraries into $APPDIR/usr/lib'
 move_lib
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Delete blacklisted libraries"
-echo ""
 
-# Delete dangerous libraries; see
-# https://github.com/probonopd/AppImages/blob/master/excludelist
+
+msg "Delete blacklisted libraries"
+# See: https://github.com/probonopd/AppImages/blob/master/excludelist
 delete_blacklisted2
-#exit
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy libfontconfig into the AppImage"
-echo ""
 
-# Copy libfontconfig into the AppImage
-# It will be used if they are newer than those of the host
+
+
+msg "Copy libfontconfig into the AppImage"
+# libfontconfig will be used if they are newer than those of the host
 # system in which the AppImage will be executed
 mkdir -p usr/optional/fontconfig
 fc_prefix="$(pkg-config --variable=libdir fontconfig)"
 cp -a "${fc_prefix}/libfontconfig"* usr/optional/fontconfig || exit 1
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy libstdc++.so.6 and libgomp.so.1 into the AppImage"
-echo ""
 
+
+msg "Copy libstdc++.so.6 and libgomp.so.1 into the AppImage"
 copy_gcc_libs
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy desktop file and application icon"
 
-# Copy hicolor icon theme
+
+msg "Copy desktop file and application icon"
 mkdir -p usr/share/icons
 echo "cp -r \"/usr/local/share/icons/\"* \"usr/share/icons\""
 cp -r "/usr/local/share/icons/"* "usr/share/icons" || exit 1
-#echo ""
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Creating top-level desktop and icon files, and application launcher"
-echo ""
 
-# TODO Might want to "|| exit 1" these, and generate_status
-#get_apprun || exit 1
+
+msg "Creating top-level desktop and icon files, and application launcher"
 cp -a "${AI_SCRIPTS_DIR}/AppRun" . || exit 1
 #cp -a "${AI_SCRIPTS_DIR}/fixes.sh" . || exit 1
 cp -a /work/appimage-helper-scripts/apprun-helper.sh "./apprun-helper.sh" || exit 1
@@ -148,15 +116,10 @@ cp -a "${AI_SCRIPTS_DIR}/zenity.sh" usr/bin || exit 1
 get_desktop || exit 1
 get_icon || exit 1
 
-#exit
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Copy locale messages"
-echo ""
 
+msg "Copy locale messages"
 # The fonts configuration should not be patched, copy back original one
 if [[ -e /usr/local/share/locale ]]; then
     mkdir -p usr/share/locale
@@ -164,12 +127,9 @@ if [[ -e /usr/local/share/locale ]]; then
 fi
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Run get_desktopintegration"
-echo ""
 
+
+msg "Run get_desktopintegration"
 # desktopintegration asks the user on first run to install a menu item
 get_desktopintegration "$LOWERAPP"
 cp -a "/sources/ci/$LOWERAPP.wrapper" "$APPDIR/usr/bin/$LOWERAPP.wrapper"
@@ -178,13 +138,9 @@ cp -a "/sources/ci/$LOWERAPP.wrapper" "$APPDIR/usr/bin/$LOWERAPP.wrapper"
 #sed -i -e "s|${DESKTOP_NAME}|${DESKTOP_NAME} (AppImage)|g" "$APPDIR/$LOWERAPP.desktop"
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Update LensFun database"
-echo ""
 
-# Update the Lensfun database and put the newest version into the bundle
+
+msg "Update LensFun database"
 #export PYTHONPATH=/$PREFIX/lib/python3.6/site-packages:$PYTHONPATH
 LFDIR=$(find /usr/local/lib/python*/site-packages/ -name lensfun)
 if [ -n "$LFDIR" ]; then
@@ -200,33 +156,35 @@ else
 fi
 printf '%s\n' "" "==================" "Contents of lensfun database:"
 ls usr/share/lensfun/version_1
-echo ""
 
-# Workaround for:
-# ImportError: /usr/lib/x86_64-linux-gnu/libgdk-x11-2.0.so.0: undefined symbol: XRRGetMonitors
+
+
+
+msg "Workaround for:" "ImportError: /usr/lib/x86_64-linux-gnu/libgdk-x11-2.0.so.0: undefined symbol: XRRGetMonitors"
 cp "$(ldconfig -p | grep libgdk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/lib/
 cp "$(ldconfig -p | grep libgtk-x11-2.0.so.0 | cut -d ">" -f 2 | xargs)" ./usr/lib/
 
 
-(cd /work/appimage-helper-scripts/appimage-exec-wrapper2 && make && cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
+(cd /work/appimage-helper-scripts/appimage-exec-wrapper2 &&
+    make &&
+    cp -a exec.so "$APPDIR/usr/lib/exec_wrapper2.so") || exit 1
 
 
 
-echo ""
-echo "########################################################################"
-echo ""
-echo "Stripping binaries"
-echo ""
 
-# Strip binaries.
+msg "Stripping binaries"
 strip_binaries
 
-export GIT_DESCRIBE=$(cd /sources && git describe)
-echo "RT_BRANCH: ${RT_BRANCH}"
-echo "GIT_DESCRIBE: ${GIT_DESCRIBE}"
 
 
 
+export GIT_DESCRIBE="$(cd /sources && git describe --tags --always)"
+msg "RT_BRANCH: ${RT_BRANCH}" "GIT_DESCRIBE: ${GIT_DESCRIBE}"
+
+
+
+
+msg "Generate AppImage"
 # Generate AppImage; this expects $ARCH, $APP and $VERSION to be set
 cd "$APPROOT"
 
@@ -242,7 +200,7 @@ else
 fi
 export ARCH="x86_64"
 export VERSION="$ver"
-echo "VERSION: $VERSION"
+printf '%s\n' "VERSION: $VERSION"
 
 cat <<EOF > "$APPDIR/VERSION.txt"
 $APP
@@ -263,10 +221,10 @@ AI_OUT="../out/${ai_filename}"
 ls -lah ../out/
 #mv -v ../out/${APP}_${VERSION}.AppImage ../out/${APP}_${VERSION}.AppImage
 
-########################################################################
-# Upload the AppDir
-########################################################################
 
+
+
+msg "Copy AppImage to /sources/out"
 pwd
 ls ../out/*
 mkdir -p /sources/out
