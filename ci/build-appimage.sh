@@ -181,7 +181,6 @@ msg "Building and installing RawTherapee"
 
 cd /sources
 export GIT_DESCRIBE="$(git describe)"
-patch -N -p0 < /sources/ci/rt-lensfundbdir.patch
 
 # RawTherapee build and install
 if [ x"${RT_BRANCH}" = "xreleases" ]; then
