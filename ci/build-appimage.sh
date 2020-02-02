@@ -32,11 +32,11 @@ yum install -y centos-release-scl || exit 1
 yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-libatomic-devel || exit 1
 
 (yum update -y &&
-    yum install -y libtool-ltdl-devel autoconf automake libtools which json-c-devel json-glib-devel gtk-doc gperf libuuid-devel libcroco-devel intltool libpng-devel cmake3 make git \
+    yum install -y libtool-ltdl-devel autoconf automake libtools which json-c-devel json-glib-devel gtk-doc gperf libuuid-devel libcroco-devel intltool libpng-devel cmake3 make git2u-all \
     file bzip2 automake fftw-devel libjpeg-turbo-devel \
     libwebp-devel libxml2-devel swig ImageMagick-c++-devel \
     bc cfitsio-devel gsl-devel matio-devel \
-    giflib-devel pugixml-devel wget curl git itstool \
+    giflib-devel pugixml-devel wget curl itstool \
     bison flex unzip dbus-devel libXtst-devel \
     mesa-libGL-devel mesa-libEGL-devel vala \
     libxslt-devel docbook-xsl libffi-devel \
