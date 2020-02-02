@@ -32,7 +32,7 @@ yum install -y centos-release-scl || exit 1
 yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-libatomic-devel || exit 1
 
 (yum update -y &&
-    yum install -y libtool-ltdl-devel autoconf automake libtools which json-c-devel json-glib-devel gtk-doc gperf libuuid-devel libcroco-devel intltool libpng-devel cmake3 make \
+    yum install -y libtool-ltdl-devel autoconf automake libtools which json-c-devel json-glib-devel gtk-doc gperf libuuid-devel libcroco-devel intltool libpng-devel cmake3 make git \
     file bzip2 automake fftw-devel libjpeg-turbo-devel \
     libwebp-devel libxml2-devel swig ImageMagick-c++-devel \
     bc cfitsio-devel gsl-devel matio-devel \
@@ -44,9 +44,6 @@ yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-libatomic-deve
     openssl-devel readline-devel expat-devel libtool \
     pixman-devel libffi-devel gtkmm24-devel gtkmm30-devel libcanberra-devel \
     lcms2-devel gtk-doc nano OpenEXR-devel libcroco-devel python36u python36u-libs python36u-devel python36u-pip gnome-common) || exit 1
-
-yum remove git* perl-Git-*
-yum -y install git2u-all
 
 
 source scl_source enable devtoolset-7
