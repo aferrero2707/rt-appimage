@@ -32,7 +32,7 @@ after_success:
   - ls -lh out/* # Assuming you have some files in out/ that you would like to upload
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/remove.sh
   - 'if [ x"${RT_BRANCH}" != "xreleases" ]; then
-        TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee_${RT_BRANCH}" ".AppImage"
+        TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee_${RT_BRANCH}" ".AppImage";
     fi'
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
   - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash  ./upload_rotate.sh "nightly" out/* >& /dev/null
