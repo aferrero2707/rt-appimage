@@ -36,7 +36,7 @@ yum install -y devtoolset-7-gcc devtoolset-7-gcc-c++ devtoolset-7-libatomic-deve
     file bzip2 automake fftw-devel libjpeg-turbo-devel \
     libwebp-devel libxml2-devel swig ImageMagick-c++-devel \
     bc cfitsio-devel gsl-devel matio-devel \
-    giflib-devel pugixml-devel wget curl git itstool \
+    giflib-devel pugixml-devel wget curl itstool \
     bison flex unzip dbus-devel libXtst-devel \
     mesa-libGL-devel mesa-libEGL-devel vala \
     libxslt-devel docbook-xsl libffi-devel \
@@ -181,7 +181,6 @@ msg "Building and installing RawTherapee"
 
 cd /sources
 export GIT_DESCRIBE="$(git describe)"
-patch -N -p0 < /sources/ci/rt-lensfundbdir.patch
 
 # RawTherapee build and install
 if [ x"${RT_BRANCH}" = "xreleases" ]; then

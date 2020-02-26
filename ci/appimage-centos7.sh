@@ -245,8 +245,7 @@ echo "Building and installing RawTherapee"
 echo ""
 
 cd /sources
-export GIT_DESCRIBE=$(git describe)
-#patch -N -p0 < /sources/ci/rt-lensfundbdir.patch || exit 1
+export GIT_DESCRIBE="$(git describe)"
 
 # RawTherapee build and install
 if [ x"${RT_BRANCH}" = "xreleases" ]; then
