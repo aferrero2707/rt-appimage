@@ -22,8 +22,8 @@ if  [ -e /tmp/commit-${GIT_BRANCH}.hash ]; then
 	diff /tmp/commit-${GIT_BRANCH}-new.hash /tmp/commit-${GIT_BRANCH}.hash
 	if [ $? -eq 0 ]; then 
 		touch travis.cancel
-		echo "No new commit to be processed, exiting"
-		exit 0
+		echo "No new commit to be processed"
+		#exit 0
 	fi
 fi
 cp /tmp/commit-${GIT_BRANCH}-new.hash ./commit-${GIT_BRANCH}.hash
