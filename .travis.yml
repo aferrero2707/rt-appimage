@@ -17,7 +17,7 @@ before_script:
   - cp -a ci RawTherapee
   - cd RawTherapee
   - bash ci/check_commit.sh ${RT_BRANCH}
-  - 'if [ -e travis.cancel ]; then
+  - 'if [ -e travis.cancel -a "$TRAVIS_EVENT_TYPE" = "cron" ]; then
         exit 0;
     fi'
   - git clone https://github.com/SpiNNakerManchester/SupportScripts.git support
@@ -33,7 +33,9 @@ after_success:
   - ls -lh
   - ls -lh out/* # Assuming you have some files in out/ that you would like to upload
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/remove.sh
-  - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee-${RT_BRANCH}-" ".AppImage"
+  - 'if [ x"${RT_BRANCH}" != "xreleases" ]; then
+        TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash ./remove.sh "nightly" "RawTherapee_${RT_BRANCH}" ".AppImage"
+    fi'
   - wget -c https://github.com/aferrero2707/uploadtool/raw/master/upload_rotate.sh
   - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash  ./upload_rotate.sh "nightly" out/* >& /dev/null
   - TRAVIS_REPO_SLUG="Beep6581/RawTherapee" bash  ./upload_rotate.sh "nightly" $TRAVIS_BUILD_DIR/RawTherapee/commit-${RT_BRANCH}.hash >& /dev/null
