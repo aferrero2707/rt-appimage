@@ -63,7 +63,7 @@ msg "Installing additional system packages"
 # Install missing six python module
 cd /work || exit 1
 rm -f get-pip.py
-wget https://bootstrap.pypa.io/get-pip.py
+wget https://bootstrap.pypa.io/pip/2.7/get-pip.py
 python get-pip.py
 pip install six || exit 1
 
